@@ -1,4 +1,4 @@
-package xyz.subho.retail.banking.entity;
+package xyz.subho.retail.banking.model;
 
 import xyz.subho.retail.banking.security.Authority;
 import xyz.subho.retail.banking.security.UserRole;
@@ -33,6 +33,7 @@ public class User implements UserDetails {
     private String password;
     private String firstName;
     private String lastName;
+    private String aadhaarId;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
@@ -186,5 +187,13 @@ public class User implements UserDetails {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
+	public String getAadhaarId() {
+		return aadhaarId;
+	}
+
+	public void setAadhaarId(String aadhaarId) {
+		this.aadhaarId = aadhaarId;
+	}
 
 }

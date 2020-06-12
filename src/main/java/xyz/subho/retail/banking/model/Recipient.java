@@ -1,4 +1,4 @@
-package xyz.subho.retail.banking.entity;
+package xyz.subho.retail.banking.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

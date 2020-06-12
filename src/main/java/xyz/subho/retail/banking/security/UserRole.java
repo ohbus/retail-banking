@@ -9,7 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import xyz.subho.retail.banking.entity.User;
+import xyz.subho.retail.banking.model.User;
 
 @Entity
 @Table(name = "user_role")

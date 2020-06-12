@@ -1,4 +1,4 @@
-package xyz.subho.retail.banking.entity;
+package xyz.subho.retail.banking.model;
 
 import java.math.BigDecimal;
 import java.util.Date;

@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import xyz.subho.retail.banking.entity.User;
+import xyz.subho.retail.banking.model.User;
 
 @Service("userDetailsService")
 public interface UserService {

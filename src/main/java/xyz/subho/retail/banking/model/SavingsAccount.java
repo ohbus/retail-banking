@@ -1,4 +1,4 @@
-package xyz.subho.retail.banking.entity;
+package xyz.subho.retail.banking.model;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,7 +14,7 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class CurrentAccount {
+public class SavingsAccount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +22,9 @@ public class CurrentAccount {
     private int accountNumber;
     private BigDecimal accountBalance;
 
-    @OneToMany(mappedBy = "currentAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "savingsAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<CurrentTransaction> currentTransactionList;
+    private List<SavingsTransaction> savingsTransactionList;
 
     public Long getId() {
         return id;
@@ -50,12 +50,12 @@ public class CurrentAccount {
         this.accountBalance = accountBalance;
     }
 
-    public List<CurrentTransaction> getCurrentTransactionList() {
-        return currentTransactionList;
+    public List<SavingsTransaction> getSavingsTransactionList() {
+        return savingsTransactionList;
     }
 
-    public void setPrimaryTransactionList(List<CurrentTransaction> currentTransactionList) {
-        this.currentTransactionList = currentTransactionList;
+    public void setSavingsTransactionList(List<SavingsTransaction> savingsTransactionList) {
+        this.savingsTransactionList = savingsTransactionList;
     }
 
 }
