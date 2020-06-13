@@ -10,7 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.core.userdetails.UserDetailsService;
+
+import xyz.subho.retail.banking.service.serviceImpl.UserSecurityServiceImpl;
 
 import java.security.SecureRandom;
 
@@ -28,17 +29,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private static final String[] PUBLIC_MATCHERS = { "/webjars/**", "/css/**", "/js/**", "/images/**", "/",
 			"/about/**", "/contact/**", "/error/**/*", "/console/**", "/signup" };
 
-	/*
-	 * @Autowired private UserSecurityServiceImpl userSecurityService;
-	 */
+	
+	@Autowired
+	private UserSecurityServiceImpl userSecurityService;
+	
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
+
 		return new BCryptPasswordEncoder(12, new SecureRandom(SALT.getBytes()));
+
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+
 		http.authorizeRequests()
 				// .antMatchers("/**")
 				.antMatchers(PUBLIC_MATCHERS).permitAll().anyRequest().authenticated();
@@ -47,17 +52,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.loginPage("/index").permitAll().and().logout()
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/index?logout")
 				.deleteCookies("remember-me").permitAll().and().rememberMe();
+
 	}
 
-	/*
-	 * @Autowired public void configureGlobal(AuthenticationManagerBuilder auth)
-	 * throws Exception {
-	 * 
-	 * auth.inMemoryAuthentication().withUser("user").password("password").roles(
-	 * "USER"); //This is in-memory authentication
-	 * 
-	 * auth.userDetailsService(userSecurityService).passwordEncoder(passwordEncoder(
-	 * )); }
-	 */
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+
+		// auth.inMemoryAuthentication().withUser("user").password("password").roles("USER");
+		// //This is in-memory authentication
+
+		auth.userDetailsService(userSecurityService).passwordEncoder(passwordEncoder());
+
+	}
 
 }

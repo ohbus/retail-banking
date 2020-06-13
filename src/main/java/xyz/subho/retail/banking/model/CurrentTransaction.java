@@ -23,7 +23,7 @@ public class CurrentTransaction {
     private double amount;
     private BigDecimal availableBalance;
     @ManyToOne
-    @JoinColumn(name = "primary_account_id")
+    @JoinColumn(name = "current_account_id")
     private CurrentAccount currentAccount;
 
 

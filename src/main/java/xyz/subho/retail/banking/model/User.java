@@ -25,7 +25,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class User implements UserDetails {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userId", nullable = false, updatable = false)
     private Long userId;
@@ -130,7 +134,7 @@ public class User implements UserDetails {
         return currentAccount;
     }
 
-    public void setPrimaryAccount(CurrentAccount currentAccount) {
+    public void setCurrentAccount(CurrentAccount currentAccount) {
         this.currentAccount = currentAccount;
     }
 

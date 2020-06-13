@@ -54,7 +54,7 @@ public class CurrentAccount {
         return currentTransactionList;
     }
 
-    public void setPrimaryTransactionList(List<CurrentTransaction> currentTransactionList) {
+    public void setCurrentTransactionList(List<CurrentTransaction> currentTransactionList) {
         this.currentTransactionList = currentTransactionList;
     }
 

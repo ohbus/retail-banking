@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 
 import xyz.subho.retail.banking.model.User;
+import xyz.subho.retail.banking.security.UserRole;
 
 @Service("userDetailsService")
 public interface UserService {
@@ -22,7 +23,7 @@ public interface UserService {
 
     void save(User user);
 
-    User createUser(User user, Set<User> userRoles);
+    User createUser(User user, Set<UserRole> userRoles);
 
     User saveUser(User user);
 
