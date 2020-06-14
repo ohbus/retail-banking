@@ -116,7 +116,7 @@ public class AccountServiceImpl implements AccountService {
 
     private int accountGen() {
     	
-        return ++nextAccountNumber;
+        return (int)Math.random()*1000000;
         
     }
 

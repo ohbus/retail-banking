@@ -51,6 +51,7 @@ public class TransactionServiceImpl implements TransactionService {
         List<CurrentTransaction> currentTransactionList = user.getCurrentAccount().getCurrentTransactionList();
 
         return currentTransactionList;
+        
     }
 
     public List<SavingsTransaction> findSavingsTransactionList(String username) {
