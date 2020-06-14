@@ -53,7 +53,8 @@ public class HomeController {
         
     }
 
-    @PostMapping("/signup")
+    @SuppressWarnings("finally")
+	@PostMapping("/signup")
     public String signupPost(@ModelAttribute("user") User user, Model model) {
 
         if (userService.checkUserExists(user.getUsername(), user.getEmail())) {
@@ -73,13 +74,21 @@ public class HomeController {
             return "signup";
             
         } else {
+        	try	{
         	
-            Set<UserRole> userRoles = new HashSet<>();
-            userRoles.add(new UserRole(user, roleDao.findByName("ROLE_USER")));
-
-            userService.createUser(user, userRoles);
-
-            return "redirect:/";
+	            Set<UserRole> userRoles = new HashSet<>();
+	            userRoles.add(new UserRole(user, roleDao.findByName("ROLE_USER")));
+	
+	            userService.createUser(user, userRoles);
+        	}
+        	catch(Exception e)	{
+        		model.addAttribute("errorSignUp", true);
+        		e.printStackTrace();
+        	}
+        	finally	{
+        		model.addAttribute("successSignUp", true);
+        		return "redirect:/";
+        	}
             
         }
         

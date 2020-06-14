@@ -16,11 +16,17 @@
 <div class="container">
     <div class="row ">
         <div class="main-center ">
-            <div class="bg-danger" th:if="${param.error}">
+            <div class="bg-warning" th:if="${param.error}">
                 Invalid username or password.
             </div>
-            <div class="bg-danger" th:if="${param.logout}">
+            <div class="bg-info" th:if="${param.logout}">
                 You have been logged out.
+            </div>
+            <div class="bg-danger" th:if="${param.errorSignUp}">
+                Please try again Later Or Contact System Administrator
+            </div>
+            <div class="bg-success" th:if="${param.successSignUp}">
+                Your account has been activated! Please login to continue.
             </div>
             <form class="form-signin" th:action="@{/index}" method="post">
                 <h2 class="form-signin-heading">Please sign in</h2>

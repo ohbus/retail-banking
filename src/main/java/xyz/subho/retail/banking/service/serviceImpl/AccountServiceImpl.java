@@ -3,6 +3,7 @@ package xyz.subho.retail.banking.service.serviceImpl;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.Date;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,6 @@ import xyz.subho.retail.banking.service.UserService;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-
-    private static int nextAccountNumber = 11223300;
 
     @Autowired
     private CurrentAccountDao currentAccountDao;
@@ -116,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
 
     private int accountGen() {
     	
-        return (int)Math.random()*1000000;
+        return ThreadLocalRandom.current().nextInt(2323, 232321474);
         
     }
 
