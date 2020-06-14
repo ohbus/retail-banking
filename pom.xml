@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>xyz.subho</groupId>
 	<artifactId>retail.banking</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<name>retail.banking</name>
 	<description>Retail banking project using MVC for TCS Case Study using Agile Methodologies</description>
 	
