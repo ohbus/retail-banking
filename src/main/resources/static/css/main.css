@@ -3,6 +3,14 @@ body {
 }
 
 html {
+    background: white;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+html1 {
     background: url("/images/bg.png") no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
