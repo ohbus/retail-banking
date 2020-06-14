@@ -6,53 +6,49 @@
 <div class="container main">
     <div class="row">
         <div class="col-md-6">
-            <h3>Schedule An Appointment</h3>
-            <form th:action="@{/appointment/create}" method="post" id="appointmentForm">
-                <input type="hidden" name="id" th:value="${appointment.id}"/>
-
+            <form th:action="@{/transfer/betweenAccounts}" method="post">
                 <div class="form-group">
-                    <label for="dateString">Pick a Date and Time:</label>
-                    <div class="input-append date form_datetime input-group" data-date="2017-01-20T15:25:00Z">
-                        <input class="form-control" type="text" value="" readonly="readonly"
-                               th:value="${dateString}" name="dateString"
-                               id="dateString" required="required"/>
-                        <span class="input-group-addon"><i class="fa fa-times" aria-hidden="true"></i></span>
-                        <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="location">Pick a location:</label>
-                    <select class="form-control" th:value="${appointment.location}" name="location" id="location"
-                    >
-                        <option disabled="disabled" selected="selected"> -- select the location --</option>
-                        <option>Helsinki</option>
-                        <option>Turku</option>
-                        <option>Tampere</option>
-                        <option>Oulu</option>
+                    <label for="transferFrom">1. Please select the account you would like to transfer From:</label>
+                    <select class="form-control" th:value="${transferFrom}" name="transferFrom" id="transferFrom"
+                            required="required">
+                        <option disabled="disabled" selected="selected"> -- select your account --</option>
+                        <option value="Primary">Primary</option>
+                        <option value="Savings">Savings</option>
                     </select>
+                    <br/>
                 </div>
 
                 <div class="form-group">
-                    <label for="description">Notes:</label>
-                    <textarea th:value="${appointment.description}" class="form-control" name="description"
-                              id="description" placeholder="Description"></textarea>
+                    <label for="transferTo">2. Please select the account you would like to transfer To:</label>
+                    <select class="form-control" th:value="${transferTo}" name="transferTo" id="transferTo"
+                            required="required">
+                        <option disabled="disabled" selected="selected"> -- select your account --</option>
+                        <option value="Primary">Primary</option>
+                        <option value="Savings">Savings</option>
+                    </select>
+                    <br/>
                 </div>
 
+                <div class="form-group">
+                    <label>3. Please specify the amount you would like to transfer: </label>
+                    <span class="input-group-addon">Amount $</span>
+                    <input th:value="${amount}" type="text" name="amount" id="amount" class="form-control"
+                           aria-label="Amount (to the nearest dollar)"/>
+                </div>
 
                 <input type="hidden"
                        name="${_csrf.parameterName}"
                        value="${_csrf.token}"/>
 
-                <a class="btn btn-primary" id="submitAppointment">Submit Scheduling</a>
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Transfer</button>
             </form>
 
             <div class="col-md-6">
             </div>
         </div>
     </div>
-    <br/>
 </div>
+
 
 <div th:replace="common/header :: body-bottom-scripts"/>
 
