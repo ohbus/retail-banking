@@ -158,6 +158,7 @@ public class User implements UserDetails {
                 ", phone='" + phone + '\'' +
                 ", recipientList=" + recipientList +
                 ", userRoles=" + userRoles +
+                ", aadhaarId='" + aadhaarId + '\'' +
                 '}';
     }
 

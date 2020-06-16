@@ -38,6 +38,7 @@ public class UserController {
         user.setUsername(newUser.getUsername());
         user.setFirstName(newUser.getFirstName());
         user.setLastName(newUser.getLastName());
+        user.setAadhaarId(newUser.getAadhaarId());
         user.setEmail(newUser.getEmail());
         user.setPhone(newUser.getPhone());
 
