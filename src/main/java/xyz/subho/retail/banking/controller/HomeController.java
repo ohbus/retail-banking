@@ -103,6 +103,7 @@ public class HomeController {
 
         model.addAttribute("currentAccount", currentAccount);
         model.addAttribute("savingsAccount", savingsAccount);
+		/* model.addAttribute("user", user); */
 
         return "userFront";
         
