@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml" lang="en">
+<head th:replace="common/header :: common-header"/>
+<body roleId="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+<head th:replace="common/header :: navbar"/>
+<style>
+	h1 {text-align: center;}
+</style>
+<div class="container main">
+    <div class="row">
+        <div class="col-lg-12">
+            <!--<h1 class="page-header">Dashboard</h1>-->
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+	<h1>Account Management Portal</h1>
+	
+	
+	
+	
+	
+    <div class="table-responsive">
+        <table id="example" class="table table-bordered table-hover table-striped">
+            <thead>
+            <tr>
+            	<th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Open Account Statements</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Aadhaar ID</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr data-th-each="userList : ${userList}">
+            	<td data-th-text="${userList.username}">...</td>
+                <td data-th-text="${userList.firstName}">...</td>
+                <td data-th-text="${userList.lastName}">...</td>
+                <td>
+                	<button type="button" class="btn btn-primary" th:datausername=${userList.username} th:onclick="|showSavingsAcc(this.getAttribute('datausername'))|">Current</button>
+                	<button type="button" class="btn btn-info" th:datausername=${userList.username} th:onclick="|showCurrentAcc(this.getAttribute('datausername'))|">Savings</button>
+                </td>
+                <td data-th-text="${userList.phone}">...</td>
+                <td data-th-text="${userList.email}">...</td>
+                <td data-th-text="${userList.aadhaarId}">...</td>
+                <td>
+				    <button th:if="${userList.enabled}" type="button" class="btn btn-success" th:datausername=${userList.username} th:onclick="|changeStatus(this.getAttribute('datausername'))|">Enabled</button>
+				    <button th:unless="${userList.enabled}" type="button" class="btn btn-danger" th:datausername=${userList.username} th:onclick="|changeStatus(this.getAttribute('datausername'))|">Disabled</button>
+				</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div th:replace="common/header :: body-bottom-scripts"/>
+<script>
+
+	function showSavingsAcc(uname)	{
+		
+		const form = document.createElement('form');
+		form.method = 'post';
+		form.action = '/admin/savingsAccount';
+		
+		const hiddenField = document.createElement('input');
+		hiddenField.name  = 'username';
+		hiddenField.value = uname;
+		
+		form.appendChild(hiddenField);
+		
+		document.body.appendChild(form);
+		form.submit();
+	
+	}
+	
+	function showCurrentAcc(uname)	{
+		
+		const form = document.createElement('form');
+		form.method = 'post';
+		form.action = '/admin/currentAccount';
+		
+		const hiddenField = document.createElement('input');
+		hiddenField.name  = 'username';
+		hiddenField.value = uname;
+		
+		form.appendChild(hiddenField);
+		
+		document.body.appendChild(form);
+		form.submit();
+	
+	}
+
+
+	function changeStatus(uname)	{
+		
+		if(uname=='Admin')	{
+			window.alert("Requested operation cannot be performed");
+			return;
+		}
+		
+		const form = document.createElement('form');
+		form.method = 'post';
+		form.action = '/admin/toggleUser';
+		
+		const hiddenField = document.createElement('input');
+		hiddenField.name  = 'username';
+		hiddenField.value = uname;
+		
+		form.appendChild(hiddenField);
+		
+		document.body.appendChild(form);
+		form.submit();
+
+	}
+
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+</script>
+</body>
+</html>
