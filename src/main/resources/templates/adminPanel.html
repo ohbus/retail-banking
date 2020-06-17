@@ -46,8 +46,8 @@
                 <td data-th-text="${userList.email}">...</td>
                 <td data-th-text="${userList.aadhaarId}">...</td>
                 <td>
-				    <button th:if="${userList.enabled}" type="button" class="btn btn-success" th:datausername=${userList.username} th:onclick="|console.log(this.getAttribute('datausername'))|">Enabled</button>
-				    <button th:unless="${userList.enabled}" type="button" class="btn btn-danger" th:datausername=${userList.username} th:onclick="|console.log(this.getAttribute('datausername'))|">Disabled</button>
+				    <button th:if="${userList.enabled}" type="button" class="btn btn-success" th:datausername=${userList.username} th:onclick="|changeStatus(this.getAttribute('datausername'))|">Enabled</button>
+				    <button th:unless="${userList.enabled}" type="button" class="btn btn-danger" th:datausername=${userList.username} th:onclick="|changeStatus(this.getAttribute('datausername'))|">Disabled</button>
 				</td>
             </tr>
             </tbody>
@@ -58,6 +58,27 @@
 
 <div th:replace="common/header :: body-bottom-scripts"/>
 <script>
+	function changeStatus(uname)	{
+		if(uname=='Admin')	{
+			window.alert("Requested operation cannot be performed");
+			return;
+		}
+		
+		const form = document.createElement('form');
+		form.method = 'post';
+		form.action = '/admin/toggleUser';
+		
+		const hiddenField = document.createElement('input');
+		hiddenField.name  = 'username';
+		hiddenField.value = uname;
+		
+		form.appendChild(hiddenField);
+		
+		document.body.appendChild(form);
+		form.submit();
+
+	}
+
     $(document).ready(function () {
         $('#example').DataTable();
     });

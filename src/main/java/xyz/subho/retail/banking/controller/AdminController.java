@@ -25,83 +25,78 @@ import xyz.subho.retail.banking.service.UserService;
 @RequestMapping("/admin")
 public class AdminController {
 
-    @Autowired
-    private UserService userService;
-    
-    @Autowired
-    private TransactionService transactionService;
+	@Autowired
+	private UserService userService;
 
-    @GetMapping("/panel")
-    public String profile(Principal principal, Model model) {
-    	
-    	String str = principal.getName();
-    	
-    	if(!principal.getName().equals("Admin"))
-    		return "error";
-    	
-        List<User> userList = userService.findUserList();
+	@Autowired
+	private TransactionService transactionService;
 
-        model.addAttribute("userList", userList);
+	@GetMapping("/panel")
+	public String profile(Principal principal, Model model) {
 
-        return "adminPanel";
-        
-    }
+		String str = principal.getName();
 
-    @PostMapping("/deleteUser")
-    public String profilePost(@ModelAttribute("user") User newUser, Model model, Principal principal) {
-    	
-    	if(principal.getName()!="Admin")
-    		return "error";
-    	
-        User user = userService.findByUsername(newUser.getUsername());
-        user.setUsername(newUser.getUsername());
-        user.setFirstName(newUser.getFirstName());
-        user.setLastName(newUser.getLastName());
-        user.setAadhaarId(newUser.getAadhaarId());
-        user.setEmail(newUser.getEmail());
-        user.setPhone(newUser.getPhone());
+		if (!principal.getName().equals("Admin"))
+			return "error";
 
-        model.addAttribute("user", user);
+		List<User> userList = userService.findUserList();
 
-        userService.saveUser(user);
+		model.addAttribute("userList", userList);
 
-        return "redirect:/admin/panel";
-        
-    }
-    
-    @RequestMapping("/currentAccount")
-    public String currentAccount(Model model, Principal principal) {
-    	
-    	if(principal.getName()!="Admin")
-    		return "error";
-       
-    	List<CurrentTransaction> currentTransactionList = transactionService.findCurrentTransactionList(principal.getName());
+		return "adminPanel";
 
-        User user = userService.findByUsername(principal.getName());
-        CurrentAccount currentAccount = user.getCurrentAccount();
+	}
 
-        model.addAttribute("currentAccount", currentAccount);
-        model.addAttribute("currentTransactionList", currentTransactionList);
+	@PostMapping("/toggleUser")
+	public String profilePost(@ModelAttribute("username") String uname, Model model, Principal principal) {
 
-        return "currentAccount";
-        
-    }
+		if (!principal.getName().equals("Admin") || uname.equals("Admin"))
+			return "error";
 
-    @RequestMapping("/savingsAccount")
-    public String savingsAccount(Model model, Principal principal) {
-    	
-    	if(principal.getName()!="Admin")
-    		return "error";
-        
-    	List<SavingsTransaction> savingsTransactionList = transactionService.findSavingsTransactionList(principal.getName());
-        User user = userService.findByUsername(principal.getName());
-        SavingsAccount savingsAccount = user.getSavingsAccount();
+		User user = userService.findByUsername(uname);
+		user.setEnabled(!user.isEnabled());
+		
+		userService.saveUser(user);
+		
+		return "redirect:/admin/panel";
 
-        model.addAttribute("savingsAccount", savingsAccount);
-        model.addAttribute("savingsTransactionList", savingsTransactionList);
+	}
 
-        return "savingsAccount";
-        
-    }
+	@RequestMapping("/currentAccount")
+	public String currentAccount(Model model, Principal principal) {
+
+		if (!principal.getName().equals("Admin"))
+			return "error";
+
+		List<CurrentTransaction> currentTransactionList = transactionService
+				.findCurrentTransactionList(principal.getName());
+
+		User user = userService.findByUsername(principal.getName());
+		CurrentAccount currentAccount = user.getCurrentAccount();
+
+		model.addAttribute("currentAccount", currentAccount);
+		model.addAttribute("currentTransactionList", currentTransactionList);
+
+		return "currentAccount";
+
+	}
+
+	@RequestMapping("/savingsAccount")
+	public String savingsAccount(Model model, Principal principal) {
+
+		if (!principal.getName().equals("Admin"))
+			return "error";
+
+		List<SavingsTransaction> savingsTransactionList = transactionService
+				.findSavingsTransactionList(principal.getName());
+		User user = userService.findByUsername(principal.getName());
+		SavingsAccount savingsAccount = user.getSavingsAccount();
+
+		model.addAttribute("savingsAccount", savingsAccount);
+		model.addAttribute("savingsTransactionList", savingsTransactionList);
+
+		return "savingsAccount";
+
+	}
 
 }
