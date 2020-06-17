@@ -110,12 +110,41 @@
                     </tr>
                 </table>
             </div>
+            <div align="center">
+            	<button type="button" class="btn btn-danger" th:datausername=${user.username} th:onclick="|changeStatus(this.getAttribute('datausername'))|">Do you want to disable your account?</button>
+            </div>
         </div>
     </div>
 </div>
 
 
 <div th:replace="common/header :: body-bottom-scripts"/>
+
+<script>
+
+	function changeStatus(uname)	{
+		
+		window.alert("Are you sure you want to delete your account?");
+		
+		const form = document.createElement('form');
+		form.method = 'post';
+		form.action = '/admin/toggleUserSelf';
+		
+		const hiddenField = document.createElement('input');
+		hiddenField.name  = 'username';
+		hiddenField.value = uname;
+		
+		form.appendChild(hiddenField);
+		
+		document.body.appendChild(form);
+		form.submit();
+	}
+
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+    
+</script>
 
 </body>
 </html>

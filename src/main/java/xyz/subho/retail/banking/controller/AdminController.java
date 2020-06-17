@@ -50,7 +50,7 @@ public class AdminController {
 	}
 
 	@PostMapping("/toggleUser")
-	public String profilePost(@ModelAttribute("username") String uname, Model model, Principal principal) {
+	public String profileActivator(@ModelAttribute("username") String uname, Model model, Principal principal) {
 
 		if (!principal.getName().equals("Admin") || uname.equals("Admin"))
 			return "error";
@@ -61,6 +61,21 @@ public class AdminController {
 		userService.saveUser(user);
 		
 		return "redirect:/admin/panel";
+
+	}
+	
+	@PostMapping("/toggleUserSelf")
+	public String profileSelfDeactivator(@ModelAttribute("username") String uname, Model model, Principal principal) {
+
+		if(!principal.getName().equals(uname))
+			return "error";
+
+		User user = userService.findByUsername(uname);
+		user.setEnabled(!user.isEnabled());
+		
+		userService.saveUser(user);
+		
+		return "redirect:/";
 
 	}
 
