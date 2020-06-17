@@ -1,5 +1,7 @@
 # Retail Banking Application
 
+![Java CI with Maven](https://github.com/ohbus/retail-banking/workflows/Java%20CI%20with%20Maven/badge.svg) [![Build Status](https://ci.subho.xyz/buildStatus/icon?job=Retail+Banking+CI)](https://ci.subho.xyz/job/Retail%20Banking%20CI/)
+
 #### Application is live at [bank.subho.xyz](https://bank.subho.xyz)
 
 #### This is a Spring Boot Application and integrated with Thymeleaf for data representation
