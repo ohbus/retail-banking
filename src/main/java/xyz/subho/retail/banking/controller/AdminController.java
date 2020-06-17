@@ -37,7 +37,7 @@ public class AdminController {
     	String str = principal.getName();
     	
     	if(!principal.getName().equals("Admin"))
-    		return "error403";
+    		return "error";
     	
         List<User> userList = userService.findUserList();
 
@@ -51,7 +51,7 @@ public class AdminController {
     public String profilePost(@ModelAttribute("user") User newUser, Model model, Principal principal) {
     	
     	if(principal.getName()!="Admin")
-    		return "error403";
+    		return "error";
     	
         User user = userService.findByUsername(newUser.getUsername());
         user.setUsername(newUser.getUsername());
@@ -65,7 +65,7 @@ public class AdminController {
 
         userService.saveUser(user);
 
-        return "profile";
+        return "redirect:/admin/panel";
         
     }
     
@@ -73,7 +73,7 @@ public class AdminController {
     public String currentAccount(Model model, Principal principal) {
     	
     	if(principal.getName()!="Admin")
-    		return "error403";
+    		return "error";
        
     	List<CurrentTransaction> currentTransactionList = transactionService.findCurrentTransactionList(principal.getName());
 
@@ -91,7 +91,7 @@ public class AdminController {
     public String savingsAccount(Model model, Principal principal) {
     	
     	if(principal.getName()!="Admin")
-    		return "error403";
+    		return "error";
         
     	List<SavingsTransaction> savingsTransactionList = transactionService.findSavingsTransactionList(principal.getName());
         User user = userService.findByUsername(principal.getName());

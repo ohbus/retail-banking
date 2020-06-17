@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +21,10 @@ import xyz.subho.retail.banking.security.UserRole;
 import xyz.subho.retail.banking.service.UserService;
 
 @Controller
-public class HomeController {
+public class HomeController implements ErrorController {
 
+	private static final String PATH = "/error";
+	
     @Autowired
     private UserService userService;
 
@@ -109,4 +112,13 @@ public class HomeController {
         
     }
     
+    @RequestMapping(value = PATH)
+    public String error() {
+        return "error";
+    }
+
+    @Override
+    public String getErrorPath() {
+        return PATH;
+    }
 }
