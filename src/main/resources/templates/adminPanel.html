@@ -39,8 +39,8 @@
                 <td data-th-text="${userList.firstName}">...</td>
                 <td data-th-text="${userList.lastName}">...</td>
                 <td>
-                	<button type="button" class="btn btn-primary" th:datausername=${userList.username} th:onclick="|console.log(this.getAttribute('datausername'))|">Current</button>
-                	<button type="button" class="btn btn-info" th:datausername=${userList.username} th:onclick="|console.log(this.getAttribute('datausername'))|">Savings</button>
+                	<button type="button" class="btn btn-primary" th:datausername=${userList.username} th:onclick="|showSavingsAcc(this.getAttribute('datausername'))|">Current</button>
+                	<button type="button" class="btn btn-info" th:datausername=${userList.username} th:onclick="|showCurrentAcc(this.getAttribute('datausername'))|">Savings</button>
                 </td>
                 <td data-th-text="${userList.phone}">...</td>
                 <td data-th-text="${userList.email}">...</td>
@@ -58,7 +58,44 @@
 
 <div th:replace="common/header :: body-bottom-scripts"/>
 <script>
+
+	function showSavingsAcc(uname)	{
+		
+		const form = document.createElement('form');
+		form.method = 'post';
+		form.action = '/admin/savingsAccount';
+		
+		const hiddenField = document.createElement('input');
+		hiddenField.name  = 'username';
+		hiddenField.value = uname;
+		
+		form.appendChild(hiddenField);
+		
+		document.body.appendChild(form);
+		form.submit();
+	
+	}
+	
+	function showCurrentAcc(uname)	{
+		
+		const form = document.createElement('form');
+		form.method = 'post';
+		form.action = '/admin/currentAccount';
+		
+		const hiddenField = document.createElement('input');
+		hiddenField.name  = 'username';
+		hiddenField.value = uname;
+		
+		form.appendChild(hiddenField);
+		
+		document.body.appendChild(form);
+		form.submit();
+	
+	}
+
+
 	function changeStatus(uname)	{
+		
 		if(uname=='Admin')	{
 			window.alert("Requested operation cannot be performed");
 			return;

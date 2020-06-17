@@ -10,14 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import xyz.subho.retail.banking.model.CurrentAccount;
 import xyz.subho.retail.banking.model.CurrentTransaction;
 import xyz.subho.retail.banking.model.SavingsAccount;
 import xyz.subho.retail.banking.model.SavingsTransaction;
 import xyz.subho.retail.banking.model.User;
-import xyz.subho.retail.banking.service.AccountService;
 import xyz.subho.retail.banking.service.TransactionService;
 import xyz.subho.retail.banking.service.UserService;
 
@@ -34,13 +32,10 @@ public class AdminController {
 	@GetMapping("/panel")
 	public String profile(Principal principal, Model model) {
 
-		String str = principal.getName();
-
 		if (!principal.getName().equals("Admin"))
 			return "error";
 
 		List<User> userList = userService.findUserList();
-
 		model.addAttribute("userList", userList);
 
 		return "adminPanel";
@@ -63,15 +58,15 @@ public class AdminController {
 	}
 
 	@RequestMapping("/currentAccount")
-	public String currentAccount(Model model, Principal principal) {
+	public String currentAccount(@ModelAttribute("username") String uname, Model model, Principal principal) {
 
 		if (!principal.getName().equals("Admin"))
 			return "error";
 
 		List<CurrentTransaction> currentTransactionList = transactionService
-				.findCurrentTransactionList(principal.getName());
+				.findCurrentTransactionList(uname);
 
-		User user = userService.findByUsername(principal.getName());
+		User user = userService.findByUsername(uname);
 		CurrentAccount currentAccount = user.getCurrentAccount();
 
 		model.addAttribute("currentAccount", currentAccount);
@@ -82,14 +77,14 @@ public class AdminController {
 	}
 
 	@RequestMapping("/savingsAccount")
-	public String savingsAccount(Model model, Principal principal) {
+	public String savingsAccount(@ModelAttribute("username") String uname, Model model, Principal principal) {
 
 		if (!principal.getName().equals("Admin"))
 			return "error";
 
 		List<SavingsTransaction> savingsTransactionList = transactionService
-				.findSavingsTransactionList(principal.getName());
-		User user = userService.findByUsername(principal.getName());
+				.findSavingsTransactionList(uname);
+		User user = userService.findByUsername(uname);
 		SavingsAccount savingsAccount = user.getSavingsAccount();
 
 		model.addAttribute("savingsAccount", savingsAccount);
