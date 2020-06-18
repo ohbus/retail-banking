@@ -44,7 +44,7 @@
            				 <div class="input-group">
      							<span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
                             	<input type="text" class="form-control" th:value="${user.aadhaarId}" id="aadhaarId" 
-                            	name="aadhaarId" roleId=" aadhaarId" placeholder="xxxx xxxx xxxx" 
+                            	name="aadhaarId" roleId=" aadhaarId" placeholder="xxxx-xxxx-xxxx" pattern="\d{12}" length="12"
                             	required="required"/>
                         </div>
                     </div>
@@ -56,7 +56,7 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-phone fa" aria-hidden="true"></i></span>
                             <input type="text" class="form-control" th:value="${user.phone}" id="phone" name="phone"
-                                   roleId="phone" placeholder="xxx-xxx-xxxx" required="required"/>
+                                   roleId="phone" placeholder="xxx-xxx-xxxx" pattern="\d{10}" length="10" required="required"/>
                         </div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                     <div class="cols-sm-10">
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
-                            <input type="text" class="form-control" th:value="${user.email}" id="email" name="email"
+                            <input type="email" class="form-control" th:value="${user.email}" id="email" name="email"
                                    roleId="email" placeholder="Enter your Email" required="required"/>
                         </div>
                     </div>
@@ -92,9 +92,11 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
                             <input type="password" class="form-control" th:value="${user.password}" id="password"
-                                   name="password" roleId="password" placeholder="Enter your Password"
-                                   required="required"/>
-                        </div>
+                                   name="password" roleId="password" placeholder="Enter your Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d]).{10,}" length="10"
+                                    required="required"/>
+                                </div>    
+                            *Password must contain At least 1 uppercase character, At least 1 lowercase character, At least 1 digit, At least 1 special character and Minimum 10 characters.
+                        
                         <div class="checkbox">
                             <label>
                                 <input id="showPassword" type="checkbox"/>Show Password
