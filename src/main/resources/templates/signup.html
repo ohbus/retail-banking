@@ -83,6 +83,15 @@
                                    name="password" roleId="password" placeholder="Enter your Password"
                                    required="required"/>
                         </div>
+                    <script type="text/javascript">
+
+ 					 function checkPassword(str)
+  						{
+    							var re = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
+    							return re.test(str);
+ 						 }
+
+					</script>
                         <div class="checkbox">
                             <label>
                                 <input id="showPassword" type="checkbox"/>Show Password
