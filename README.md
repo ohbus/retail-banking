@@ -22,7 +22,7 @@ _Note: You can always build your own JRE using `jlink` from JDK 11+_
 
 ### To run the application
 
-#### **`docker run -d -p 80:8080 subhrodip/retail-banking-0.1.0`**
+#### **`docker run -d -p 80:8080 subhrodip/retail-banking:0.1.0`**
 
 ##### Open **`localhost`** in your browser to see application running
 
