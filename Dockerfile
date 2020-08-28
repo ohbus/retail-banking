@@ -1,11 +1,13 @@
 FROM openjdk:11-jre-slim
 
-LABEL maintainer="Subhrodip Mohanta"
-LABEL email="hello@subho.xyz"
-LABEL application="Retail Banking"
+LABEL maintainer="Subhrodip Mohanta hello@subho.xyz"
+LABEL artifact="retial-banking"
+LABEL name="Retail Banking"
 
-COPY target/retail.banking-0.1.0.jar /usr/local/retail.banking/
+ARG JAR_FILE=target/*.jar
+
+COPY ${JAR_FILE} app.jar
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "/usr/local/retail.banking/retail.banking-0.1.0.jar"]
+ENTRYPOINT [ "java", "-jar", "/app.jar" ]
