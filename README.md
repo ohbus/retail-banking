@@ -3,7 +3,7 @@
 ![Banking CI Master](https://github.com/ohbus/retail-banking/workflows/Banking%20CI%20Master/badge.svg?branch=master)
 ![Banking CI Main](https://github.com/ohbus/retail-banking/workflows/Banking%20CI%20Main/badge.svg)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=ohbus_retail-banking&metric=ncloc)](https://sonarcloud.io/dashboard?id=ohbus_retail-banking)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ohbus_retail-banking&metric=coverage)](https://sonarcloud.io/dashboard?id=ohbus_retail-banking)
+<!--[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ohbus_retail-banking&metric=coverage)](https://sonarcloud.io/dashboard?id=ohbus_retail-banking) -->
 
 #### Application is live at [bank.subho.xyz](https://bank.subho.xyz)
 
