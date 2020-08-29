@@ -1,4 +1,4 @@
-name: Maven Package
+name: Banking Package Publisher
 
 on:
   release:

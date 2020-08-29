@@ -24,6 +24,10 @@
 
 	<properties>
 		<java.version>11</java.version>
+		
+		<sonar.projectKey>ohbus_retail-banking</sonar.projectKey>
+		<sonar.organization>subho</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<dependencies>
