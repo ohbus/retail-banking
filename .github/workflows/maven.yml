@@ -21,3 +21,7 @@ jobs:
         # These two env variables are needed for sonar analysis
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GCP_MYSQL_DB_HOST: ${{ secrets.GCP_MYSQL_DB_HOST }}
+        GCP_MYSQL_DB_PORT: ${{ secrets.GCP_MYSQL_DB_PORT }}
+        GCP_MYSQL_DB_UNAME: ${{ secrets.GCP_MYSQL_DB_UNAME }}
+        GCP_MYSQL_DB_PASSWD: ${{ secrets.GCP_MYSQL_DB_PASSWD }}

@@ -24,4 +24,8 @@ jobs:
     - name: Publish to GitHub Packages Apache Maven
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
       env:
-        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GCP_MYSQL_DB_HOST: ${{ secrets.GCP_MYSQL_DB_HOST }}
+        GCP_MYSQL_DB_PORT: ${{ secrets.GCP_MYSQL_DB_PORT }}
+        GCP_MYSQL_DB_UNAME: ${{ secrets.GCP_MYSQL_DB_UNAME }}
+        GCP_MYSQL_DB_PASSWD: ${{ secrets.GCP_MYSQL_DB_PASSWD }}

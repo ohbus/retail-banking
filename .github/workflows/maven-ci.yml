@@ -17,3 +17,8 @@ jobs:
         java-version: 1.11
     - name: Build with Maven
       run: mvn clean verify
+      env:
+        GCP_MYSQL_DB_HOST: ${{ secrets.GCP_MYSQL_DB_HOST }}
+        GCP_MYSQL_DB_PORT: ${{ secrets.GCP_MYSQL_DB_PORT }}
+        GCP_MYSQL_DB_UNAME: ${{ secrets.GCP_MYSQL_DB_UNAME }}
+        GCP_MYSQL_DB_PASSWD: ${{ secrets.GCP_MYSQL_DB_PASSWD }}
