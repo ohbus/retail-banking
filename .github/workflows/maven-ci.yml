@@ -2,7 +2,7 @@ name: Banking CI Main
 
 on:
   push:
-    branches: [ master ]
+    branches: [ '**', '!master' ]
 
 jobs:
   build:
