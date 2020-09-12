@@ -1,6 +1,9 @@
 # Retail Banking Application
 
-![Java CI with Maven](https://github.com/ohbus/retail-banking/workflows/Java%20CI%20with%20Maven/badge.svg) [![Build Status](https://ci.subho.xyz/buildStatus/icon?job=Retail+Banking+CI)](https://ci.subho.xyz/job/Retail%20Banking%20CI/)
+![Banking CI Master](https://github.com/ohbus/retail-banking/workflows/Banking%20CI%20Master/badge.svg?branch=master)
+![Banking CI Main](https://github.com/ohbus/retail-banking/workflows/Banking%20CI%20Main/badge.svg)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=ohbus_retail-banking&metric=ncloc)](https://sonarcloud.io/dashboard?id=ohbus_retail-banking)
+<!--[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ohbus_retail-banking&metric=coverage)](https://sonarcloud.io/dashboard?id=ohbus_retail-banking) -->
 
 #### Application is live at [bank.subho.xyz](https://bank.subho.xyz)
 
@@ -14,7 +17,7 @@
 
 _Note: You can always build your own JRE using `jlink` from JDK 11+_
 
-#### **`java -jar retail-banking-0.1.0.jar`**
+#### **`java -jar retail-banking-1.0.jar`**
 
 ##### Open **`localhost:8080`** from your browser to see the application running
 
@@ -22,8 +25,6 @@ _Note: You can always build your own JRE using `jlink` from JDK 11+_
 
 ### To run the application
 
-#### **`docker run -d -p 80:8080 subhrodip/retail-banking-0.1.0.jar`**
+#### **`docker run -d -p 80:8080 subhrodip/retail-banking:1.0`**
 
 ##### Open **`localhost`** in your browser to see application running
-
-
