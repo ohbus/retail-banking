@@ -16,6 +16,9 @@ jobs:
         # Disabling shallow clone is recommended for improving relevancy of reporting
         fetch-depth: 0
 
+    - name: Spin Database Container
+      run: docker run -d --rm -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 mariadb:10.3 --lower_case_table_names=1
+    
     - name: Set up JDK 1.11
       uses: actions/setup-java@v1
       with:
@@ -35,10 +38,14 @@ jobs:
         # These two env variables are needed for sonar analysis
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        GCP_MYSQL_DB_HOST: ${{ secrets.GCP_MYSQL_DB_HOST }}
-        GCP_MYSQL_DB_PORT: ${{ secrets.GCP_MYSQL_DB_PORT }}
-        GCP_MYSQL_DB_UNAME: ${{ secrets.GCP_MYSQL_DB_UNAME }}
-        GCP_MYSQL_DB_PASSWD: ${{ secrets.GCP_MYSQL_DB_PASSWD }}
+        GCP_MYSQL_DB_HOST: 0.0.0.0
+        GCP_MYSQL_DB_PORT: 3306
+        GCP_MYSQL_DB_UNAME: root
+        GCP_MYSQL_DB_PASSWD: root
+        # GCP_MYSQL_DB_HOST: ${{ secrets.GCP_MYSQL_DB_HOST }}
+        # GCP_MYSQL_DB_PORT: ${{ secrets.GCP_MYSQL_DB_PORT }}
+        # GCP_MYSQL_DB_UNAME: ${{ secrets.GCP_MYSQL_DB_UNAME }}
+        # GCP_MYSQL_DB_PASSWD: ${{ secrets.GCP_MYSQL_DB_PASSWD }}
 
     - name: Extract branch name
       shell: bash
