@@ -28,3 +28,27 @@ jobs:
         GCP_MYSQL_DB_PORT: ${{ secrets.GCP_MYSQL_DB_PORT }}
         GCP_MYSQL_DB_UNAME: ${{ secrets.GCP_MYSQL_DB_UNAME }}
         GCP_MYSQL_DB_PASSWD: ${{ secrets.GCP_MYSQL_DB_PASSWD }}
+
+    - name: Build and Push Retail Banking Application to DockerHub
+      uses: docker/build-push-action@v1.1.0
+      with:
+        username: ${{ secrets.DOCKERHUB_UNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWD }}
+        registry: docker.io
+        repository: subhrodip/retail-banking
+        tags: ${{ steps.extract_branch.outputs.branch }},latest
+        labels: pipeline_build=true,cloud_build=true
+        always_pull: true
+        push: true
+
+    - name: Build and Push Retail Banking Application to GitHub Packages
+      uses: docker/build-push-action@v1.1.0
+      with:
+        username: ohbus
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: docker.pkg.github.com
+        repository: ohbus/retail-banking/retail-banking
+        tags: ${{ steps.extract_branch.outputs.branch }},latest
+        labels: pipeline_build=true,cloud_build=true
+        always_pull: true
+        push: true

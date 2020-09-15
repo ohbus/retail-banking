@@ -16,4 +16,4 @@ jobs:
       with:
         java-version: 1.11
     - name: Build with Maven
-      run: mvn clean verify -DskipTests
+      run: mvn clean verify -DskipTests -Dmaven.test.skip=true

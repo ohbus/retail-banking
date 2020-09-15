@@ -22,3 +22,20 @@ jobs:
         GCP_MYSQL_DB_PORT: ${{ secrets.GCP_MYSQL_DB_PORT }}
         GCP_MYSQL_DB_UNAME: ${{ secrets.GCP_MYSQL_DB_UNAME }}
         GCP_MYSQL_DB_PASSWD: ${{ secrets.GCP_MYSQL_DB_PASSWD }}
+    
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/} | tr / -)"
+      id: extract_branch
+
+    - name: Build and Push Retail Banking Application to DockerHub
+      uses: docker/build-push-action@v1.1.0
+      with:
+        username: ${{ secrets.DOCKERHUB_UNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWD }}
+        registry: docker.io
+        repository: subhrodip/retail-banking
+        tags: dev-${{ steps.extract_branch.outputs.branch }}
+        labels: pipeline_build=true,cloud_build=true
+        always_pull: true
+        push: true
