@@ -13,9 +13,9 @@
 #### Send in your Contribution using Pull Requests
 
 ## Contributing
-This repository is contribution friendly. If you'd like to add or improve a logic or build new features, your contribution is welcome!
+This repository is contribution friendly. If you'd like to add or improve a features, your contribution is welcome!
 
-Please go through this comprehensive guide to setup the repository in your local enviornment using this guide [CONTRIBUTING.md](https://github.com/ohbus/retail-banking/blob/master/CONTRIBUTING.md)
+Please go through this comprehensive guide to setup the repository in your local enviornment using this [CONTRIBUTING.md](https://github.com/ohbus/retail-banking/blob/master/CONTRIBUTING.md)
 
 ### The executable runtime can be either downloaded from [packages](https://github.com/ohbus/retail-banking/packages) or the [releases](https://github.com/ohbus/retail-banking/releases) page
 
