@@ -1,7 +1,7 @@
 FROM openjdk:11-jre-slim
 
 LABEL maintainer="Subhrodip Mohanta hello@subho.xyz"
-LABEL artifact="retial-banking"
+LABEL artifact="retail-banking"
 LABEL name="Retail Banking"
 
 ARG JAR_FILE=target/*.jar
