@@ -1,9 +1,9 @@
 # Retail Banking Application
 
 ![Banking CI Master](https://github.com/ohbus/retail-banking/workflows/Banking%20CI%20Master/badge.svg?branch=master)
-![Banking CI Main](https://github.com/ohbus/retail-banking/workflows/Banking%20CI%20Main/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ohbus_retail-banking&metric=alert_status)](https://sonarcloud.io/dashboard?id=ohbus_retail-banking)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=ohbus_retail-banking&metric=ncloc)](https://sonarcloud.io/dashboard?id=ohbus_retail-banking)
+[![Docker pulls](https://img.shields.io/docker/pulls/subhrodip/retail-banking)](https://hub.docker.com/r/subhrodip/retail-banking)
 <!--[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ohbus_retail-banking&metric=coverage)](https://sonarcloud.io/dashboard?id=ohbus_retail-banking) -->
 
 #### Application is live at [bank.subho.xyz](https://bank.subho.xyz)
