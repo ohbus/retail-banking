@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import xyz.subho.retail.banking.model.User;
 import xyz.subho.retail.banking.security.UserRole;
 
-@Service("userDetailsService")
 public interface UserService {
 
     User findByUsername(String username);
