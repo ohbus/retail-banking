@@ -21,7 +21,7 @@ import xyz.subho.retail.banking.security.UserRole;
 import xyz.subho.retail.banking.service.UserService;
 
 @Controller
-public class HomeController implements ErrorController {
+public class HomeController {
 
 	private static final String PATH = "/error";
 	
@@ -112,13 +112,7 @@ public class HomeController implements ErrorController {
         
     }
     
-    @RequestMapping(value = PATH)
-    public String error() {
-        return "error";
-    }
+    
 
-    @Override
-    public String getErrorPath() {
-        return PATH;
-    }
+    
 }

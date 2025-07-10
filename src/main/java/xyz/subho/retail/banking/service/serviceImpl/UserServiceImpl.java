@@ -2,6 +2,10 @@ package xyz.subho.retail.banking.service.serviceImpl;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+
+import xyz.subho.retail.banking.model.CurrentAccount;
+import xyz.subho.retail.banking.model.SavingsAccount;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +36,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AccountService accountService;
+    
 
     public void save(User user) {
     	
@@ -74,8 +77,15 @@ public class UserServiceImpl implements UserService {
 
             user.getUserRoles().addAll(userRoles);
 
-            user.setCurrentAccount(accountService.createCurrentAccount());
-            user.setSavingsAccount(accountService.createSavingsAccount());
+            CurrentAccount currentAccount = new CurrentAccount();
+            currentAccount.setAccountBalance(new java.math.BigDecimal(0.0));
+            currentAccount.setAccountNumber(accountGen());
+            user.setCurrentAccount(currentAccount);
+
+            SavingsAccount savingsAccount = new SavingsAccount();
+            savingsAccount.setAccountBalance(new java.math.BigDecimal(0.0));
+            savingsAccount.setAccountNumber(accountGen());
+            user.setSavingsAccount(savingsAccount);
 
             localUser = userDao.save(user);
         }
@@ -130,6 +140,12 @@ public class UserServiceImpl implements UserService {
         logger.info("user status : {}", user.isEnabled());
         userDao.save(user);
         logger.info(username, "{}, is disabled.");
+        
+    }
+
+    private int accountGen() {
+    	
+        return ThreadLocalRandom.current().nextInt(2323, 232321474);
         
     }
     
