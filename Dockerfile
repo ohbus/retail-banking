@@ -1,5 +1,5 @@
 # Build stage
-FROM maven:3.8.4-openjdk-21 AS build
+FROM maven:3-amazoncorretto-21-debian AS build
 
 WORKDIR /app
 
@@ -7,14 +7,15 @@ COPY pom.xml .
 RUN mvn dependency:go-offline
 
 COPY src ./src
-RUN mvn clean install
+RUN mvn clean package -DskipTests
 
 # Run stage
-FROM openjdk:21-jre-slim
+FROM amazoncorretto:21-alpine
 
 LABEL maintainer="Subhrodip Mohanta hello@subho.xyz"
 LABEL artifact="retail-banking"
 LABEL name="Retail Banking"
+LABEL org.opencontainers.image.source="https://github.com/ohbus/retail-banking"
 
 WORKDIR /app
 
