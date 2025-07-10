@@ -1,0 +1,32 @@
+services:
+  mysql-standalone:
+    image: mysql:8.0
+    container_name: mysql-standalone
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=bank
+    networks:
+      - spring-app-network
+
+  spring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-app
+    ports:
+      - "9998:9998"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      - .:/app
+    depends_on:
+      - mysql-standalone
+    networks:
+      - spring-app-network
+
+networks:
+  spring-app-network:
+    driver: bridge

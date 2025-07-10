@@ -1,0 +1,343 @@
+databaseChangeLog:
+- changeSet:
+    id: 1752149359704-1
+    author: muso (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: current_accountPK
+            name: id
+            type: BIGINT
+        - column:
+            name: account_balance
+            type: DECIMAL(19, 2)
+        - column:
+            constraints:
+              nullable: false
+            name: account_number
+            type: INT
+        tableName: current_account
+- changeSet:
+    id: 1752149359704-2
+    author: muso (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: current_transactionPK
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: amount
+            type: DOUBLE PRECISION
+        - column:
+            name: available_balance
+            type: DECIMAL(19, 2)
+        - column:
+            name: date
+            type: datetime
+        - column:
+            name: description
+            type: VARCHAR(255)
+        - column:
+            name: status
+            type: VARCHAR(255)
+        - column:
+            name: type
+            type: VARCHAR(255)
+        - column:
+            name: current_account_id
+            type: BIGINT
+        tableName: current_transaction
+- changeSet:
+    id: 1752149359704-3
+    author: muso (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: recipientPK
+            name: id
+            type: BIGINT
+        - column:
+            name: account_number
+            type: VARCHAR(255)
+        - column:
+            name: description
+            type: VARCHAR(255)
+        - column:
+            name: email
+            type: VARCHAR(255)
+        - column:
+            name: name
+            type: VARCHAR(255)
+        - column:
+            name: phone
+            type: VARCHAR(255)
+        - column:
+            name: user_id
+            type: BIGINT
+        tableName: recipient
+- changeSet:
+    id: 1752149359704-4
+    author: muso (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: rolePK
+            name: role_id
+            type: INT
+        - column:
+            name: name
+            type: VARCHAR(255)
+        tableName: role
+- changeSet:
+    id: 1752149359704-5
+    author: muso (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: savings_accountPK
+            name: id
+            type: BIGINT
+        - column:
+            name: account_balance
+            type: DECIMAL(19, 2)
+        - column:
+            constraints:
+              nullable: false
+            name: account_number
+            type: INT
+        tableName: savings_account
+- changeSet:
+    id: 1752149359704-6
+    author: muso (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: savings_transactionPK
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: amount
+            type: DOUBLE PRECISION
+        - column:
+            name: available_balance
+            type: DECIMAL(19, 2)
+        - column:
+            name: date
+            type: datetime
+        - column:
+            name: description
+            type: VARCHAR(255)
+        - column:
+            name: status
+            type: VARCHAR(255)
+        - column:
+            name: type
+            type: VARCHAR(255)
+        - column:
+            name: savings_account_id
+            type: BIGINT
+        tableName: savings_transaction
+- changeSet:
+    id: 1752149359704-7
+    author: muso (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: userPK
+            name: user_id
+            type: BIGINT
+        - column:
+            name: aadhaar_id
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: email
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: enabled
+            type: BIT
+        - column:
+            name: first_name
+            type: VARCHAR(255)
+        - column:
+            name: last_name
+            type: VARCHAR(255)
+        - column:
+            name: password
+            type: VARCHAR(255)
+        - column:
+            name: phone
+            type: VARCHAR(255)
+        - column:
+            name: username
+            type: VARCHAR(255)
+        - column:
+            name: current_account_id
+            type: BIGINT
+        - column:
+            name: savings_account_id
+            type: BIGINT
+        tableName: user
+- changeSet:
+    id: 1752149359704-8
+    author: muso (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: user_rolePK
+            name: user_role_id
+            type: BIGINT
+        - column:
+            name: role_id
+            type: INT
+        - column:
+            name: user_id
+            type: BIGINT
+        tableName: user_role
+- changeSet:
+    id: 1752149359704-9
+    author: muso (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: email
+        constraintName: UC_USEREMAIL_COL
+        tableName: user
+- changeSet:
+    id: 1752149359704-10
+    author: muso (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: recipient
+        constraintName: FK3041ks22uyyuuw441k5671ah9
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: user_id
+        referencedTableName: user
+        validate: true
+- changeSet:
+    id: 1752149359704-11
+    author: muso (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: savings_account_id
+        baseTableName: savings_transaction
+        constraintName: FK4bt1l2090882974glyn79q2s9
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: savings_account
+        validate: true
+- changeSet:
+    id: 1752149359704-12
+    author: muso (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: user_role
+        constraintName: FK859n2jvi8ivhui0rl0esws6o
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: user_id
+        referencedTableName: user
+        validate: true
+- changeSet:
+    id: 1752149359704-13
+    author: muso (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: role_id
+        baseTableName: user_role
+        constraintName: FKa68196081fvovjhkek5m97n3y
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: role_id
+        referencedTableName: role
+        validate: true
+- changeSet:
+    id: 1752149359704-14
+    author: muso (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: current_account_id
+        baseTableName: user
+        constraintName: FKbkyc3ecdxbwixum4k634i91h5
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: current_account
+        validate: true
+- changeSet:
+    id: 1752149359704-15
+    author: muso (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: savings_account_id
+        baseTableName: user
+        constraintName: FKihums7d3g5cv9ehminfs1539e
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: savings_account
+        validate: true
+- changeSet:
+    id: 1752149359704-16
+    author: muso (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: current_account_id
+        baseTableName: current_transaction
+        constraintName: FKjbgxa2nmarnct7c0b4vuqiivk
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: current_account
+        validate: true
+

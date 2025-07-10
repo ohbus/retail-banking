@@ -149,7 +149,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public void toSomeoneElseTransfer(Recipient recipient, String accountType, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount) {
-    	
         if (accountType.equalsIgnoreCase("Current")) {
             currentAccount.setAccountBalance(currentAccount.getAccountBalance().subtract(new BigDecimal(amount)));
             currentAccountDao.save(currentAccount);
@@ -158,7 +157,6 @@ public class TransactionServiceImpl implements TransactionService {
 
             CurrentTransaction currentTransaction = new CurrentTransaction(date, "Transfer to recipient " + recipient.getName(), "Transfer", "Finished", Double.parseDouble(amount), currentAccount.getAccountBalance(), currentAccount);
             currentTransactionDao.save(currentTransaction);
-            
         } else if (accountType.equalsIgnoreCase("Savings")) {
             savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().subtract(new BigDecimal(amount)));
             savingsAccountDao.save(savingsAccount);
@@ -167,9 +165,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             SavingsTransaction savingsTransaction = new SavingsTransaction(date, "Transfer to recipient " + recipient.getName(), "Transfer", "Finished", Double.parseDouble(amount), savingsAccount.getAccountBalance(), savingsAccount);
             savingsTransactionDao.save(savingsTransaction);
-            
         }
-        
     }
     
 }

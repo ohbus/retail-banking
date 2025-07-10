@@ -1,0 +1,15 @@
+services:
+  mysql-dev:
+    image: mysql:8.0
+    container_name: mysql-dev
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=bank_dev
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge
