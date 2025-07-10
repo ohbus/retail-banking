@@ -15,35 +15,20 @@ jobs:
       with:
         # Disabling shallow clone is recommended for improving relevancy of reporting
         fetch-depth: 0
-
-    - name: Spin Database Container
-      run: docker run -d --rm -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 mariadb:10.3 --lower_case_table_names=1
     
-    - name: Set up JDK 11
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
         java-version: '21'
-        distribution: 'temurin'
+        distribution: 'microsoft'
         cache: 'maven'
     
-    - name: Cache Maven Dependecies
-      uses: actions/cache@v4
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-  
-    
     - name: Build with Maven
-      run: mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
       env:
         # These two env variables are needed for sonar analysis
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        GCP_MYSQL_DB_HOST: ${{ secrets.GCP_MYSQL_DB_HOST }}
-        GCP_MYSQL_DB_PORT: ${{ secrets.GCP_MYSQL_DB_PORT }}
-        GCP_MYSQL_DB_UNAME: ${{ secrets.GCP_MYSQL_DB_UNAME }}
-        GCP_MYSQL_DB_PASSWD: ${{ secrets.GCP_MYSQL_DB_PASSWD }}
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3

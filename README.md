@@ -23,11 +23,11 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-*   Docker
-*   Docker Compose
+*   Docker (Docker Compose is now included with Docker Desktop and Docker Engine; no separate installation is needed)
 
 ### Installation
 
+#### Option 1: Clone the repository (recommended)
 1.  **Clone the repository:**
     ```sh
     git clone https://github.com/ohbus/retail-banking.git
@@ -37,13 +37,19 @@ These instructions will get you a copy of the project up and running on your loc
     cd retail-banking
     ```
 
+#### Option 2: Download as ZIP (for beginners or those without a GitHub account)
+1.  Go to the [GitHub repository page](https://github.com/ohbus/retail-banking).
+2.  Click the green **Code** button, then select **Download ZIP**.
+3.  Extract the ZIP file to your desired location.
+4.  Open a terminal and navigate to the extracted `retail-banking` directory.
+
 ## Development
 
 To start the application in a development environment, you can use the provided Docker Compose file to start a local MySQL database.
 
 1.  **Start the development database:**
     ```sh
-    docker-compose -f docker-compose.dev.yml up -d
+    docker compose -f docker-compose.dev.yml up -d
     ```
 2.  **Run the application from your IDE:**
     *   Open the project in your favorite IDE (e.g., IntelliJ IDEA).
@@ -56,7 +62,7 @@ The application will be available at `http://localhost:9998`.
 To run the application in a production-like environment, use the following command:
 
 ```sh
-docker-compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 This will start the application and a MySQL database container in detached mode.
