@@ -24,6 +24,11 @@
 
 	<properties>
 		<java.version>21</java.version>
+		<spring-boot.version>3.2.0</spring-boot.version>
+		<mysql-connector.version>8.0.33</mysql-connector.version>
+		<testcontainers.version>1.20.2</testcontainers.version>
+		<liquibase-maven-plugin.version>4.9.1</liquibase-maven-plugin.version>
+		<jacoco.version>0.8.13</jacoco.version>
 		
 		<sonar.projectKey>ohbus_retail-banking</sonar.projectKey>
 		<sonar.organization>ohbus</sonar.organization>
@@ -42,8 +47,6 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         
-		        
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -69,7 +72,7 @@
 		<dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.33</version>
+            <version>${mysql-connector.version}</version>
             <scope>runtime</scope>
         </dependency>
 		
@@ -96,21 +99,17 @@
             <artifactId>liquibase-core</artifactId>
         </dependency>
 
-        
-
-        
-
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>mysql</artifactId>
-            <version>1.19.3</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>1.19.3</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
 		
@@ -125,10 +124,29 @@
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
-                <version>4.9.1</version>
+                <version>${liquibase-maven-plugin.version}</version>
                 <configuration>
                     <propertyFile>src/main/resources/liquibase.properties</propertyFile>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
