@@ -22,4 +22,6 @@ COPY --from=build /app/target/retail.banking-1.0.jar .
 
 EXPOSE 9998
 
+ENV SPRING_PROFILES_ACTIVE=prod
+
 ENTRYPOINT [ "java", "-jar", "retail.banking-1.0.jar" ]
