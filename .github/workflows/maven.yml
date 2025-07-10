@@ -5,12 +5,10 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  build-jar:
     runs-on: ubuntu-latest
 
     steps:
-
       - uses: actions/checkout@v4
         with:
           # Disabling shallow clone is recommended for improving relevancy of reporting
@@ -37,6 +35,26 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jar-artifacts
+          path: target/*.jar
+          retention-days: 1
+
+  build-and-push-images:
+    runs-on: ubuntu-latest
+    needs: build-jar
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: jar-artifacts
+          path: target/
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -46,7 +64,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_UNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWD }}
 
-      - name: Build and Push Retail Banking Application to DockerHub
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push to DockerHub
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -57,7 +82,7 @@ jobs:
             pipeline_build=true
             cloud_build=true
 
-      - name: Build and Push Retail Banking Application to GitHub Packages
+      - name: Build and Push to GitHub Container Registry
         uses: docker/build-push-action@v5
         with:
           context: .
