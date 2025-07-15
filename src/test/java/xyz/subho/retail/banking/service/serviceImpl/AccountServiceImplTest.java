@@ -1,30 +1,32 @@
 package xyz.subho.retail.banking.service.serviceImpl;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import xyz.subho.retail.banking.dao.CurrentAccountDao;
-import xyz.subho.retail.banking.dao.SavingsAccountDao;
-import xyz.subho.retail.banking.model.*;
-import xyz.subho.retail.banking.service.TransactionService;
-import xyz.subho.retail.banking.service.UserService;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@Disabled
+import xyz.subho.retail.banking.dao.CurrentAccountDao;
+import xyz.subho.retail.banking.dao.SavingsAccountDao;
+import xyz.subho.retail.banking.model.CurrentAccount;
+import xyz.subho.retail.banking.model.CurrentTransaction;
+import xyz.subho.retail.banking.model.SavingsAccount;
+import xyz.subho.retail.banking.model.SavingsTransaction;
+import xyz.subho.retail.banking.model.User;
+import xyz.subho.retail.banking.service.TransactionService;
+import xyz.subho.retail.banking.service.UserService;
+
+@ExtendWith(MockitoExtension.class)
 class AccountServiceImplTest {
-
-    @InjectMocks
-    private AccountServiceImpl accountService;
 
     @Mock
     private CurrentAccountDao currentAccountDao;
@@ -38,122 +40,291 @@ class AccountServiceImplTest {
     @Mock
     private TransactionService transactionService;
 
+    @Mock
+    private Principal principal;
+
+    @InjectMocks
+    private AccountServiceImpl accountService;
+
+    private User testUser;
+    private CurrentAccount testCurrentAccount;
+    private SavingsAccount testSavingsAccount;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        testUser = new User();
+        testUser.setUsername("testuser");
+
+        testCurrentAccount = new CurrentAccount();
+        testCurrentAccount.setAccountNumber(123456);
+        testCurrentAccount.setAccountBalance(new BigDecimal("1000.00"));
+
+        testSavingsAccount = new SavingsAccount();
+        testSavingsAccount.setAccountNumber(789012);
+        testSavingsAccount.setAccountBalance(new BigDecimal("2000.00"));
+
+        testUser.setCurrentAccount(testCurrentAccount);
+        testUser.setSavingsAccount(testSavingsAccount);
     }
 
     @Test
-    void createCurrentAccount() {
-        CurrentAccount currentAccount = new CurrentAccount();
-        currentAccount.setAccountNumber(12345);
-        currentAccount.setAccountBalance(new BigDecimal("0.00")); // Initialize balance
-        when(currentAccountDao.save(any(CurrentAccount.class))).thenReturn(currentAccount);
-        when(currentAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(currentAccount);
+    void testCreateCurrentAccount_Success() {
+        // Given
+        CurrentAccount expectedAccount = new CurrentAccount();
+        expectedAccount.setAccountNumber(123456);
+        expectedAccount.setAccountBalance(new BigDecimal("0.0"));
 
-        CurrentAccount createdAccount = accountService.createCurrentAccount();
+        when(currentAccountDao.save(any(CurrentAccount.class))).thenReturn(expectedAccount);
+        when(currentAccountDao.findByAccountNumber(anyInt())).thenReturn(expectedAccount);
 
-        assertNotNull(createdAccount);
-        assertEquals(new BigDecimal("0.00"), createdAccount.getAccountBalance());
-        assertNotNull(createdAccount.getAccountNumber());
-        verify(currentAccountDao, times(1)).save(any(CurrentAccount.class));
-        verify(currentAccountDao, times(1)).findByAccountNumber(any(Integer.class));
+        // When
+        CurrentAccount result = accountService.createCurrentAccount();
+
+        // Then
+        assertNotNull(result);
+        assertEquals(new BigDecimal("0.0"), result.getAccountBalance());
+        assertTrue(result.getAccountNumber() >= 2323 && result.getAccountNumber() < 232321474);
+        verify(currentAccountDao).save(any(CurrentAccount.class));
+        verify(currentAccountDao).findByAccountNumber(anyInt());
     }
 
     @Test
-    void createSavingsAccount() {
-        SavingsAccount savingsAccount = new SavingsAccount();
-        savingsAccount.setAccountNumber(54321);
-        savingsAccount.setAccountBalance(new BigDecimal("0.00")); // Initialize balance
-        when(savingsAccountDao.save(any(SavingsAccount.class))).thenReturn(savingsAccount);
-        when(savingsAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(savingsAccount);
+    void testCreateSavingsAccount_Success() {
+        // Given
+        SavingsAccount expectedAccount = new SavingsAccount();
+        expectedAccount.setAccountNumber(789012);
+        expectedAccount.setAccountBalance(new BigDecimal("0.0"));
 
-        SavingsAccount createdAccount = accountService.createSavingsAccount();
+        when(savingsAccountDao.save(any(SavingsAccount.class))).thenReturn(expectedAccount);
+        when(savingsAccountDao.findByAccountNumber(anyInt())).thenReturn(expectedAccount);
 
-        assertNotNull(createdAccount);
-        assertEquals(new BigDecimal("0.00"), createdAccount.getAccountBalance());
-        assertNotNull(createdAccount.getAccountNumber());
-        verify(savingsAccountDao, times(1)).save(any(SavingsAccount.class));
-        verify(savingsAccountDao, times(1)).findByAccountNumber(any(Integer.class));
+        // When
+        SavingsAccount result = accountService.createSavingsAccount();
+
+        // Then
+        assertNotNull(result);
+        assertEquals(new BigDecimal("0.0"), result.getAccountBalance());
+        assertTrue(result.getAccountNumber() >= 2323 && result.getAccountNumber() < 232321474);
+        verify(savingsAccountDao).save(any(SavingsAccount.class));
+        verify(savingsAccountDao).findByAccountNumber(anyInt());
     }
 
     @Test
-    void depositCurrentAccount() {
-        User user = new User();
-        CurrentAccount currentAccount = new CurrentAccount();
-        currentAccount.setAccountBalance(new BigDecimal("100.00"));
-        user.setCurrentAccount(currentAccount);
-
-        Principal principal = mock(Principal.class);
+    void testDeposit_CurrentAccount_Success() {
+        // Given
+        double depositAmount = 500.00;
         when(principal.getName()).thenReturn("testuser");
-        when(userService.findByUsername("testuser")).thenReturn(user);
-        doNothing().when(currentAccountDao).save(any(CurrentAccount.class));
-        doNothing().when(transactionService).saveCurrentDepositTransaction(any(CurrentTransaction.class));
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
 
-        accountService.deposit("Current", 50.0, principal);
+        // When
+        accountService.deposit("Current", depositAmount, principal);
 
-        assertEquals(new BigDecimal("150.00"), currentAccount.getAccountBalance());
-        verify(currentAccountDao, times(1)).save(currentAccount);
-        verify(transactionService, times(1)).saveCurrentDepositTransaction(any(CurrentTransaction.class));
+        // Then
+        assertEquals(new BigDecimal("1500.00"), testCurrentAccount.getAccountBalance());
+        verify(currentAccountDao).save(testCurrentAccount);
+        verify(transactionService).saveCurrentDepositTransaction(any(CurrentTransaction.class));
     }
 
     @Test
-    void depositSavingsAccount() {
-        User user = new User();
-        SavingsAccount savingsAccount = new SavingsAccount();
-        savingsAccount.setAccountBalance(new BigDecimal("200.00"));
-        user.setSavingsAccount(savingsAccount);
-
-        Principal principal = mock(Principal.class);
+    void testDeposit_SavingsAccount_Success() {
+        // Given
+        double depositAmount = 300.00;
         when(principal.getName()).thenReturn("testuser");
-        when(userService.findByUsername("testuser")).thenReturn(user);
-        doNothing().when(savingsAccountDao).save(any(SavingsAccount.class));
-        doNothing().when(transactionService).saveSavingsDepositTransaction(any(SavingsTransaction.class));
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
 
-        accountService.deposit("Savings", 75.0, principal);
+        // When
+        accountService.deposit("Savings", depositAmount, principal);
 
-        assertEquals(new BigDecimal("275.00"), savingsAccount.getAccountBalance());
-        verify(savingsAccountDao, times(1)).save(savingsAccount);
-        verify(transactionService, times(1)).saveSavingsDepositTransaction(any(SavingsTransaction.class));
+        // Then
+        assertEquals(new BigDecimal("2300.00"), testSavingsAccount.getAccountBalance());
+        verify(savingsAccountDao).save(testSavingsAccount);
+        verify(transactionService).saveSavingsDepositTransaction(any(SavingsTransaction.class));
     }
 
     @Test
-    void withdrawCurrentAccount() {
-        User user = new User();
-        CurrentAccount currentAccount = new CurrentAccount();
-        currentAccount.setAccountBalance(new BigDecimal("100.00"));
-        user.setCurrentAccount(currentAccount);
-
-        Principal principal = mock(Principal.class);
+    void testDeposit_CurrentAccount_CaseInsensitive() {
+        // Given
+        double depositAmount = 100.00;
         when(principal.getName()).thenReturn("testuser");
-        when(userService.findByUsername("testuser")).thenReturn(user);
-        doNothing().when(currentAccountDao).save(any(CurrentAccount.class));
-        doNothing().when(transactionService).saveCurrentWithdrawTransaction(any(CurrentTransaction.class));
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
 
-        accountService.withdraw("Current", 50.0, principal);
+        // When
+        accountService.deposit("CURRENT", depositAmount, principal);
 
-        assertEquals(new BigDecimal("50.00"), currentAccount.getAccountBalance());
-        verify(currentAccountDao, times(1)).save(currentAccount);
-        verify(transactionService, times(1)).saveCurrentWithdrawTransaction(any(CurrentTransaction.class));
+        // Then
+        assertEquals(new BigDecimal("1100.00"), testCurrentAccount.getAccountBalance());
+        verify(currentAccountDao).save(testCurrentAccount);
     }
 
     @Test
-    void withdrawSavingsAccount() {
-        User user = new User();
-        SavingsAccount savingsAccount = new SavingsAccount();
-        savingsAccount.setAccountBalance(new BigDecimal("200.00"));
-        user.setSavingsAccount(savingsAccount);
-
-        Principal principal = mock(Principal.class);
+    void testDeposit_SavingsAccount_CaseInsensitive() {
+        // Given
+        double depositAmount = 200.00;
         when(principal.getName()).thenReturn("testuser");
-        when(userService.findByUsername("testuser")).thenReturn(user);
-        when(savingsAccountDao.save(any(SavingsAccount.class))).thenReturn(savingsAccount);
-        doNothing().when(transactionService).saveSavingsWithdrawTransaction(any(SavingsTransaction.class));
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
 
-        accountService.withdraw("Savings", 75.0, principal);
+        // When
+        accountService.deposit("savings", depositAmount, principal);
 
-        assertEquals(new BigDecimal("125.00"), savingsAccount.getAccountBalance());
-        verify(savingsAccountDao, times(1)).save(savingsAccount);
-        verify(transactionService, times(1)).saveSavingsWithdrawTransaction(any(SavingsTransaction.class));
+        // Then
+        assertEquals(new BigDecimal("2200.00"), testSavingsAccount.getAccountBalance());
+        verify(savingsAccountDao).save(testSavingsAccount);
+    }
+
+    @Test
+    void testDeposit_InvalidAccountType_NoOperation() {
+        // Given
+        double depositAmount = 100.00;
+        when(principal.getName()).thenReturn("testuser");
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
+
+        // When
+        accountService.deposit("InvalidType", depositAmount, principal);
+
+        // Then
+        assertEquals(new BigDecimal("1000.00"), testCurrentAccount.getAccountBalance());
+        assertEquals(new BigDecimal("2000.00"), testSavingsAccount.getAccountBalance());
+        verify(currentAccountDao, never()).save(any());
+        verify(savingsAccountDao, never()).save(any());
+    }
+
+    @Test
+    void testWithdraw_CurrentAccount_Success() {
+        // Given
+        double withdrawAmount = 200.00;
+        when(principal.getName()).thenReturn("testuser");
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
+
+        // When
+        accountService.withdraw("Current", withdrawAmount, principal);
+
+        // Then
+        assertEquals(new BigDecimal("800.00"), testCurrentAccount.getAccountBalance());
+        verify(currentAccountDao).save(testCurrentAccount);
+        verify(transactionService).saveCurrentWithdrawTransaction(any(CurrentTransaction.class));
+    }
+
+    @Test
+    void testWithdraw_SavingsAccount_Success() {
+        // Given
+        double withdrawAmount = 400.00;
+        when(principal.getName()).thenReturn("testuser");
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
+
+        // When
+        accountService.withdraw("Savings", withdrawAmount, principal);
+
+        // Then
+        assertEquals(new BigDecimal("1600.00"), testSavingsAccount.getAccountBalance());
+        verify(savingsAccountDao).save(testSavingsAccount);
+        verify(transactionService).saveSavingsWithdrawTransaction(any(SavingsTransaction.class));
+    }
+
+    @Test
+    void testWithdraw_CurrentAccount_AllowsNegativeBalance() {
+        // Given
+        double withdrawAmount = 1500.00; // More than available balance
+        when(principal.getName()).thenReturn("testuser");
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
+
+        // When
+        accountService.withdraw("Current", withdrawAmount, principal);
+
+        // Then
+        assertEquals(new BigDecimal("-500.00"), testCurrentAccount.getAccountBalance());
+        verify(currentAccountDao).save(testCurrentAccount);
+    }
+
+    @Test
+    void testWithdraw_SavingsAccount_AllowsNegativeBalance() {
+        // Given
+        double withdrawAmount = 2500.00; // More than available balance
+        when(principal.getName()).thenReturn("testuser");
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
+
+        // When
+        accountService.withdraw("Savings", withdrawAmount, principal);
+
+        // Then
+        assertEquals(new BigDecimal("-500.00"), testSavingsAccount.getAccountBalance());
+        verify(savingsAccountDao).save(testSavingsAccount);
+    }
+
+    @Test
+    void testWithdraw_InvalidAccountType_NoOperation() {
+        // Given
+        double withdrawAmount = 100.00;
+        when(principal.getName()).thenReturn("testuser");
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
+
+        // When
+        accountService.withdraw("InvalidType", withdrawAmount, principal);
+
+        // Then
+        assertEquals(new BigDecimal("1000.00"), testCurrentAccount.getAccountBalance());
+        assertEquals(new BigDecimal("2000.00"), testSavingsAccount.getAccountBalance());
+        verify(currentAccountDao, never()).save(any());
+        verify(savingsAccountDao, never()).save(any());
+    }
+
+    @Test
+    void testDeposit_ZeroAmount() {
+        // Given
+        double depositAmount = 0.00;
+        when(principal.getName()).thenReturn("testuser");
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
+
+        // When
+        accountService.deposit("Current", depositAmount, principal);
+
+        // Then
+        assertEquals(new BigDecimal("1000.00"), testCurrentAccount.getAccountBalance());
+        verify(currentAccountDao).save(testCurrentAccount);
+    }
+
+    @Test
+    void testWithdraw_ZeroAmount() {
+        // Given
+        double withdrawAmount = 0.00;
+        when(principal.getName()).thenReturn("testuser");
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
+
+        // When
+        accountService.withdraw("Savings", withdrawAmount, principal);
+
+        // Then
+        assertEquals(new BigDecimal("2000.00"), testSavingsAccount.getAccountBalance());
+        verify(savingsAccountDao).save(testSavingsAccount);
+    }
+
+    @Test
+    void testDeposit_NegativeAmount() {
+        // Given
+        double depositAmount = -100.00;
+        when(principal.getName()).thenReturn("testuser");
+        when(userService.findByUsername("testuser")).thenReturn(testUser);
+
+        // When
+        accountService.deposit("Current", depositAmount, principal);
+
+        // Then
+        assertEquals(new BigDecimal("900.00"), testCurrentAccount.getAccountBalance());
+        verify(currentAccountDao).save(testCurrentAccount);
+    }
+
+    @Test
+    void testAccountGen_GeneratesValidRange() {
+        // Using reflection to test private method
+        try {
+            java.lang.reflect.Method method = AccountServiceImpl.class.getDeclaredMethod("accountGen");
+            method.setAccessible(true);
+
+            for (int i = 0; i < 100; i++) {
+                int accountNumber = (int) method.invoke(accountService);
+                assertTrue(accountNumber >= 2323 && accountNumber < 232321474);
+            }
+        } catch (Exception e) {
+            fail("Failed to test accountGen method: " + e.getMessage());
+        }
     }
 }
