@@ -24,6 +24,7 @@ import xyz.subho.retail.banking.model.SavingsAccount;
 import xyz.subho.retail.banking.model.SavingsTransaction;
 import xyz.subho.retail.banking.model.User;
 import xyz.subho.retail.banking.security.UserRole;
+import xyz.subho.retail.banking.security.SessionInvalidationService;
 import xyz.subho.retail.banking.service.TransactionService;
 import xyz.subho.retail.banking.service.UserService;
 
@@ -38,11 +39,14 @@ public class AdminController {
 	private final UserService userService;
 	private final TransactionService transactionService;
     private final RoleDao roleDao;
+    private final SessionInvalidationService sessionInvalidationService;
 
-    public AdminController(UserService userService, TransactionService transactionService, RoleDao roleDao) {
+    public AdminController(UserService userService, TransactionService transactionService, RoleDao roleDao,
+            SessionInvalidationService sessionInvalidationService) {
         this.userService = userService;
         this.transactionService = transactionService;
         this.roleDao = roleDao;
+        this.sessionInvalidationService = sessionInvalidationService;
     }
 
 	@GetMapping("/panel")
@@ -63,6 +67,7 @@ public class AdminController {
 		user.setEnabled(!user.isEnabled());
 		
 		userService.saveUser(user);
+		sessionInvalidationService.expireSessions(uname);
 		
 		return "redirect:/admin/panel";
 
@@ -78,6 +83,7 @@ public class AdminController {
 		user.setEnabled(!user.isEnabled());
 		
 		userService.saveUser(user);
+		sessionInvalidationService.expireSessions(uname);
 		
 		return "redirect:/";
 

@@ -21,6 +21,7 @@ import org.springframework.ui.ExtendedModelMap;
 import xyz.subho.retail.banking.dao.RoleDao;
 import xyz.subho.retail.banking.model.User;
 import xyz.subho.retail.banking.security.Role;
+import xyz.subho.retail.banking.security.SessionInvalidationService;
 import xyz.subho.retail.banking.service.TransactionService;
 import xyz.subho.retail.banking.service.UserService;
 
@@ -39,6 +40,9 @@ class AdminControllerTest {
     @Mock
     private RoleDao roleDao;
 
+    @Mock
+    private SessionInvalidationService sessionInvalidationService;
+
     @Test
     void selfDeactivationOnlyAcceptsOwnUsername() {
         Principal principal = () -> "alice";
@@ -46,6 +50,7 @@ class AdminControllerTest {
         when(userService.findByUsername("alice")).thenReturn(user);
 
         assertEquals("redirect:/", controller.profileSelfDeactivator("alice", new ExtendedModelMap(), principal));
+        verify(sessionInvalidationService).expireSessions("alice");
         assertEquals("error", controller.profileSelfDeactivator("bob", new ExtendedModelMap(), principal));
     }
 
@@ -69,6 +74,7 @@ class AdminControllerTest {
         assertEquals("redirect:/admin/panel", controller.profileActivator("bob", new ExtendedModelMap()));
         assertFalse(user.isEnabled());
         verify(userService).saveUser(user);
+        verify(sessionInvalidationService).expireSessions("bob");
     }
 
     @Test
