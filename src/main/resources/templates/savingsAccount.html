@@ -62,6 +62,13 @@
             </tbody>
         </table>
     </div>
+    <nav th:if="${savingsTransactionPage.totalPages > 1}" aria-label="Transaction history pages">
+        <a th:if="${savingsTransactionPage.hasPrevious()}"
+           th:href="@{/account/savingsAccount(page=${savingsTransactionPage.number - 1})}">Previous</a>
+        <span>Page [[${savingsTransactionPage.number + 1}]] of [[${savingsTransactionPage.totalPages}]]</span>
+        <a th:if="${savingsTransactionPage.hasNext()}"
+           th:href="@{/account/savingsAccount(page=${savingsTransactionPage.number + 1})}">Next</a>
+    </nav>
 </div>
 
 

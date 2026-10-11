@@ -16,6 +16,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -49,38 +53,42 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void findCurrentTransactionList() {
+    void findsCurrentTransactionsAsAPage() {
         User user = new User();
         CurrentAccount currentAccount = new CurrentAccount();
         List<CurrentTransaction> transactions = new ArrayList<>();
         transactions.add(new CurrentTransaction());
-        currentAccount.setCurrentTransactionList(transactions);
+        currentAccount.setId(1L);
         user.setCurrentAccount(currentAccount);
 
         when(userService.findByUsername("testuser")).thenReturn(user);
+        when(currentTransactionDao.findByCurrentAccountIdOrderByDateDescIdDesc(1L, PageRequest.of(0, 10)))
+                .thenReturn(new PageImpl<>(transactions));
 
-        List<CurrentTransaction> result = transactionService.findCurrentTransactionList("testuser");
+        Page<CurrentTransaction> result = transactionService.findCurrentTransactionPage("testuser", PageRequest.of(0, 10));
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(1, result.getContent().size());
         verify(userService, times(1)).findByUsername("testuser");
     }
 
     @Test
-    void findSavingsTransactionList() {
+    void findsSavingsTransactionsAsAPage() {
         User user = new User();
         SavingsAccount savingsAccount = new SavingsAccount();
         List<SavingsTransaction> transactions = new ArrayList<>();
         transactions.add(new SavingsTransaction());
-        savingsAccount.setSavingsTransactionList(transactions);
+        savingsAccount.setId(2L);
         user.setSavingsAccount(savingsAccount);
 
         when(userService.findByUsername("testuser")).thenReturn(user);
+        when(savingsTransactionDao.findBySavingsAccountIdOrderByDateDescIdDesc(2L, PageRequest.of(0, 10)))
+                .thenReturn(new PageImpl<>(transactions));
 
-        List<SavingsTransaction> result = transactionService.findSavingsTransactionList("testuser");
+        Page<SavingsTransaction> result = transactionService.findSavingsTransactionPage("testuser", PageRequest.of(0, 10));
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(1, result.getContent().size());
         verify(userService, times(1)).findByUsername("testuser");
     }
 

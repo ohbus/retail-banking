@@ -63,6 +63,13 @@
             </tbody>
         </table>
     </div>
+    <nav th:if="${currentTransactionPage.totalPages > 1}" aria-label="Transaction history pages">
+        <a th:if="${currentTransactionPage.hasPrevious()}"
+           th:href="@{/account/currentAccount(page=${currentTransactionPage.number - 1})}">Previous</a>
+        <span>Page [[${currentTransactionPage.number + 1}]] of [[${currentTransactionPage.totalPages}]]</span>
+        <a th:if="${currentTransactionPage.hasNext()}"
+           th:href="@{/account/currentAccount(page=${currentTransactionPage.number + 1})}">Next</a>
+    </nav>
 </div>
 
 

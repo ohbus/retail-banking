@@ -5,6 +5,8 @@ import java.security.Principal;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,21 +47,14 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    public List<CurrentTransaction> findCurrentTransactionList(String username) {
-    	
+    public Page<CurrentTransaction> findCurrentTransactionPage(String username, Pageable pageable) {
         User user = userService.findByUsername(username);
-        List<CurrentTransaction> currentTransactionList = user.getCurrentAccount().getCurrentTransactionList();
-
-        return currentTransactionList;
-        
+        return currentTransactionDao.findByCurrentAccountIdOrderByDateDescIdDesc(user.getCurrentAccount().getId(), pageable);
     }
 
-    public List<SavingsTransaction> findSavingsTransactionList(String username) {
-    	
+    public Page<SavingsTransaction> findSavingsTransactionPage(String username, Pageable pageable) {
         User user = userService.findByUsername(username);
-        List<SavingsTransaction> savingsTransactionList = user.getSavingsAccount().getSavingsTransactionList();
-
-        return savingsTransactionList;
+        return savingsTransactionDao.findBySavingsAccountIdOrderByDateDescIdDesc(user.getSavingsAccount().getId(), pageable);
     }
 
     public void saveCurrentDepositTransaction(CurrentTransaction currentTransaction) {

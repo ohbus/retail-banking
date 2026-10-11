@@ -2,13 +2,14 @@ package xyz.subho.retail.banking.controller;
 
 import java.security.Principal;
 import java.math.BigDecimal;
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import xyz.subho.retail.banking.model.CurrentAccount;
 import xyz.subho.retail.banking.model.CurrentTransaction;
@@ -23,6 +24,8 @@ import xyz.subho.retail.banking.service.UserService;
 @RequestMapping("/account")
 public class AccountController {
 
+    private static final int TRANSACTIONS_PER_PAGE = 50;
+
     private final UserService userService;
     private final AccountService accountService;
     private final TransactionService transactionService;
@@ -35,29 +38,33 @@ public class AccountController {
     }
 
     @RequestMapping("/currentAccount")
-    public String currentAccount(Model model, Principal principal) {
-       
-    	List<CurrentTransaction> currentTransactionList = transactionService.findCurrentTransactionList(principal.getName());
+    public String currentAccount(Model model, Principal principal,
+                                 @RequestParam(defaultValue = "0") int page) {
+        Page<CurrentTransaction> currentTransactionPage = transactionService.findCurrentTransactionPage(
+                principal.getName(), PageRequest.of(normalizePage(page), TRANSACTIONS_PER_PAGE));
 
         User user = userService.findByUsername(principal.getName());
         CurrentAccount currentAccount = user.getCurrentAccount();
 
         model.addAttribute("currentAccount", currentAccount);
-        model.addAttribute("currentTransactionList", currentTransactionList);
+        model.addAttribute("currentTransactionList", currentTransactionPage.getContent());
+        model.addAttribute("currentTransactionPage", currentTransactionPage);
 
         return "currentAccount";
         
     }
 
     @RequestMapping("/savingsAccount")
-    public String savingsAccount(Model model, Principal principal) {
-        
-    	List<SavingsTransaction> savingsTransactionList = transactionService.findSavingsTransactionList(principal.getName());
+    public String savingsAccount(Model model, Principal principal,
+                                 @RequestParam(defaultValue = "0") int page) {
+        Page<SavingsTransaction> savingsTransactionPage = transactionService.findSavingsTransactionPage(
+                principal.getName(), PageRequest.of(normalizePage(page), TRANSACTIONS_PER_PAGE));
         User user = userService.findByUsername(principal.getName());
         SavingsAccount savingsAccount = user.getSavingsAccount();
 
         model.addAttribute("savingsAccount", savingsAccount);
-        model.addAttribute("savingsTransactionList", savingsTransactionList);
+        model.addAttribute("savingsTransactionList", savingsTransactionPage.getContent());
+        model.addAttribute("savingsTransactionPage", savingsTransactionPage);
 
         return "savingsAccount";
         
@@ -121,6 +128,10 @@ public class AccountController {
         } catch (NumberFormatException | NullPointerException exception) {
             throw new IllegalArgumentException("Amount is invalid", exception);
         }
+    }
+
+    private int normalizePage(int page) {
+        return Math.max(page, 0);
     }
     
 }

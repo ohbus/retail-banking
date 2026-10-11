@@ -53,6 +53,13 @@
             </tbody>
         </table>
     </div>
+    <nav th:if="${userPage.totalPages > 1}" aria-label="User pages">
+        <a th:if="${userPage.hasPrevious()}"
+           th:href="@{/admin/panel(page=${userPage.number - 1})}">Previous</a>
+        <span>Page [[${userPage.number + 1}]] of [[${userPage.totalPages}]]</span>
+        <a th:if="${userPage.hasNext()}"
+           th:href="@{/admin/panel(page=${userPage.number + 1})}">Next</a>
+    </nav>
 </div>
 
 

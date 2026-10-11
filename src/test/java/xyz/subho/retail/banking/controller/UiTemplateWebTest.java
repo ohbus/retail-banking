@@ -2,6 +2,7 @@ package xyz.subho.retail.banking.controller;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -85,8 +88,11 @@ class UiTemplateWebTest {
         user.setSavingsAccount(savingsAccount);
 
         when(userService.findByUsername("alice")).thenReturn(user);
-        when(transactionService.findCurrentTransactionList("alice")).thenReturn(List.of());
-        when(transactionService.findSavingsTransactionList("alice")).thenReturn(List.of());
+        when(transactionService.findCurrentTransactionPage(eq("alice"), org.mockito.ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(Page.empty());
+        when(transactionService.findSavingsTransactionPage(eq("alice"), org.mockito.ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(Page.empty());
+        when(userService.findUserPage(org.mockito.ArgumentMatchers.any(Pageable.class))).thenReturn(Page.empty());
         when(transactionService.findRecipientList(any())).thenReturn(List.of(recipient()));
     }
 
@@ -182,7 +188,8 @@ class UiTemplateWebTest {
         disabledUser.setUsername("bob");
         disabledUser.setFirstName("Bob");
         disabledUser.setEnabled(false);
-        when(userService.findUserList()).thenReturn(List.of(user, disabledUser));
+        when(userService.findUserPage(org.mockito.ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(user, disabledUser)));
 
         mockMvc.perform(get("/admin/panel").with(user("admin").roles("ADMIN")))
                 .andExpect(status().isOk())

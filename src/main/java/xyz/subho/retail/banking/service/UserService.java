@@ -1,8 +1,9 @@
 package xyz.subho.retail.banking.service;
 
-import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import xyz.subho.retail.banking.model.User;
@@ -26,7 +27,7 @@ public interface UserService {
 
     User saveUser(User user);
 
-    List<User> findUserList();
+    Page<User> findUserPage(Pageable pageable);
 
     void enableUser(String username);
 

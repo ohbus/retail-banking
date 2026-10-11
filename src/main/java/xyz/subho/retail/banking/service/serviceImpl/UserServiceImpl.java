@@ -1,7 +1,6 @@
 package xyz.subho.retail.banking.service.serviceImpl;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -11,6 +10,8 @@ import xyz.subho.retail.banking.model.SavingsAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -126,9 +127,8 @@ public class UserServiceImpl implements UserService {
         
     }
 
-    public List<User> findUserList() {
-    	
-        return userDao.findAll();
+    public Page<User> findUserPage(Pageable pageable) {
+        return userDao.findAll(pageable);
         
     }
 

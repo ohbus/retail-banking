@@ -2,9 +2,10 @@ package xyz.subho.retail.banking.controller;
 
 import java.security.Principal;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import xyz.subho.retail.banking.dao.RoleDao;
@@ -29,6 +31,8 @@ import xyz.subho.retail.banking.service.UserService;
 @RequestMapping("/admin")
 public class AdminController {
 
+	private static final int TRANSACTIONS_PER_PAGE = 50;
+
 	private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
 	private final UserService userService;
@@ -43,9 +47,10 @@ public class AdminController {
 
 	@GetMapping("/panel")
 	@PreAuthorize("hasRole('ADMIN')")
-	public String profile(Model model) {
-		List<User> userList = userService.findUserList();
-		model.addAttribute("userList", userList);
+	public String profile(Model model, @RequestParam(defaultValue = "0") int page) {
+		Page<User> userPage = userService.findUserPage(PageRequest.of(Math.max(page, 0), TRANSACTIONS_PER_PAGE));
+		model.addAttribute("userList", userPage.getContent());
+		model.addAttribute("userPage", userPage);
 
 		return "adminPanel";
 
@@ -81,14 +86,15 @@ public class AdminController {
 	@RequestMapping("/currentAccount")
 	@PreAuthorize("hasRole('ADMIN')")
 	public String currentAccount(@ModelAttribute("username") String uname, Model model) {
-		List<CurrentTransaction> currentTransactionList = transactionService
-				.findCurrentTransactionList(uname);
+		Page<CurrentTransaction> currentTransactionPage = transactionService
+				.findCurrentTransactionPage(uname, PageRequest.of(0, TRANSACTIONS_PER_PAGE));
 
 		User user = userService.findByUsername(uname);
 		CurrentAccount currentAccount = user.getCurrentAccount();
 
 		model.addAttribute("currentAccount", currentAccount);
-		model.addAttribute("currentTransactionList", currentTransactionList);
+		model.addAttribute("currentTransactionList", currentTransactionPage.getContent());
+		model.addAttribute("currentTransactionPage", currentTransactionPage);
 
 		return "currentAccount";
 
@@ -97,13 +103,14 @@ public class AdminController {
 	@RequestMapping("/savingsAccount")
 	@PreAuthorize("hasRole('ADMIN')")
 	public String savingsAccount(@ModelAttribute("username") String uname, Model model) {
-		List<SavingsTransaction> savingsTransactionList = transactionService
-				.findSavingsTransactionList(uname);
+		Page<SavingsTransaction> savingsTransactionPage = transactionService
+				.findSavingsTransactionPage(uname, PageRequest.of(0, TRANSACTIONS_PER_PAGE));
 		User user = userService.findByUsername(uname);
 		SavingsAccount savingsAccount = user.getSavingsAccount();
 
 		model.addAttribute("savingsAccount", savingsAccount);
-		model.addAttribute("savingsTransactionList", savingsTransactionList);
+		model.addAttribute("savingsTransactionList", savingsTransactionPage.getContent());
+		model.addAttribute("savingsTransactionPage", savingsTransactionPage);
 
 		return "savingsAccount";
 

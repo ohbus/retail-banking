@@ -3,6 +3,9 @@ package xyz.subho.retail.banking.service;
 import java.security.Principal;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import xyz.subho.retail.banking.model.CurrentAccount;
 import xyz.subho.retail.banking.model.CurrentTransaction;
 import xyz.subho.retail.banking.model.Recipient;
@@ -11,9 +14,9 @@ import xyz.subho.retail.banking.model.SavingsTransaction;
 
 public interface TransactionService {
 
-    List<CurrentTransaction> findCurrentTransactionList(String username);
+    Page<CurrentTransaction> findCurrentTransactionPage(String username, Pageable pageable);
 
-    List<SavingsTransaction> findSavingsTransactionList(String username);
+    Page<SavingsTransaction> findSavingsTransactionPage(String username, Pageable pageable);
 
     void saveCurrentDepositTransaction(CurrentTransaction currentTransaction);
 
