@@ -65,7 +65,7 @@ public class AccountServiceImpl implements AccountService {
     	
         User user = userService.findByUsername(principal.getName());
 
-        if (accountType.equalsIgnoreCase("Current")) {
+        if ("Current".equalsIgnoreCase(accountType)) {
             CurrentAccount currentAccount = user.getCurrentAccount();
             currentAccount.setAccountBalance(currentAccount.getAccountBalance().add(amount));
             currentAccountDao.save(currentAccount);
@@ -94,7 +94,7 @@ public class AccountServiceImpl implements AccountService {
     	
         User user = userService.findByUsername(principal.getName());
 
-        if (accountType.equalsIgnoreCase("Current")) {
+        if ("Current".equalsIgnoreCase(accountType)) {
             CurrentAccount currentAccount = user.getCurrentAccount();
             requireFunds(currentAccount.getAccountBalance(), amount);
             currentAccount.setAccountBalance(currentAccount.getAccountBalance().subtract(amount));

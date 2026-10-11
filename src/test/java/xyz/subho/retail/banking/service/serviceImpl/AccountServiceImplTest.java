@@ -209,6 +209,8 @@ class AccountServiceImplTest {
         assertThrows(IllegalArgumentException.class,
                 () -> accountService.deposit("Other", new BigDecimal("1.00"), principal));
         assertThrows(IllegalArgumentException.class,
+                () -> accountService.deposit(null, new BigDecimal("1.00"), principal));
+        assertThrows(IllegalArgumentException.class,
                 () -> accountService.deposit("Current", new BigDecimal("1.001"), principal));
         verifyNoInteractions(userService, currentAccountDao, transactionService);
     }
