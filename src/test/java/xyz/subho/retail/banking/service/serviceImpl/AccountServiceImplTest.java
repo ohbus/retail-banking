@@ -10,6 +10,7 @@ import xyz.subho.retail.banking.dao.SavingsAccountDao;
 import xyz.subho.retail.banking.model.*;
 import xyz.subho.retail.banking.service.TransactionService;
 import xyz.subho.retail.banking.service.UserService;
+import xyz.subho.retail.banking.service.AccountNumberService;
 
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -36,6 +37,9 @@ class AccountServiceImplTest {
     @Mock
     private TransactionService transactionService;
 
+    @Mock
+    private AccountNumberService accountNumberService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -47,7 +51,8 @@ class AccountServiceImplTest {
         currentAccount.setAccountNumber(12345);
         currentAccount.setAccountBalance(new BigDecimal("0.00")); // Initialize balance
         when(currentAccountDao.save(any(CurrentAccount.class))).thenReturn(currentAccount);
-        when(currentAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(null, currentAccount);
+        when(accountNumberService.next()).thenReturn(12345);
+        when(currentAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(currentAccount);
 
         CurrentAccount createdAccount = accountService.createCurrentAccount();
 
@@ -55,7 +60,7 @@ class AccountServiceImplTest {
         assertEquals(new BigDecimal("0.00"), createdAccount.getAccountBalance());
         assertNotNull(createdAccount.getAccountNumber());
         verify(currentAccountDao, times(1)).save(any(CurrentAccount.class));
-        verify(currentAccountDao, atLeastOnce()).findByAccountNumber(any(Integer.class));
+        verify(accountNumberService).next();
     }
 
     @Test
@@ -64,7 +69,8 @@ class AccountServiceImplTest {
         savingsAccount.setAccountNumber(54321);
         savingsAccount.setAccountBalance(new BigDecimal("0.00")); // Initialize balance
         when(savingsAccountDao.save(any(SavingsAccount.class))).thenReturn(savingsAccount);
-        when(savingsAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(null, savingsAccount);
+        when(accountNumberService.next()).thenReturn(54321);
+        when(savingsAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(savingsAccount);
 
         SavingsAccount createdAccount = accountService.createSavingsAccount();
 
@@ -72,30 +78,31 @@ class AccountServiceImplTest {
         assertEquals(new BigDecimal("0.00"), createdAccount.getAccountBalance());
         assertNotNull(createdAccount.getAccountNumber());
         verify(savingsAccountDao, times(1)).save(any(SavingsAccount.class));
-        verify(savingsAccountDao, atLeastOnce()).findByAccountNumber(any(Integer.class));
+        verify(accountNumberService).next();
     }
 
     @Test
-    void accountNumberGenerationRetriesOnCollision() {
-        CurrentAccount existing = new CurrentAccount();
+    void usesReservedNumberForCurrentAccount() {
         CurrentAccount created = new CurrentAccount();
         created.setAccountBalance(BigDecimal.ZERO.setScale(2));
-        when(currentAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(existing, null, created);
+        when(accountNumberService.next()).thenReturn(12345);
+        when(currentAccountDao.findByAccountNumber(12345)).thenReturn(created);
         when(currentAccountDao.save(any(CurrentAccount.class))).thenReturn(created);
 
         assertEquals(created, accountService.createCurrentAccount());
+        verify(accountNumberService).next();
     }
 
     @Test
-    void accountNumberGenerationChecksSavingsAccounts() {
-        SavingsAccount existing = new SavingsAccount();
-        CurrentAccount created = new CurrentAccount();
+    void usesReservedNumberForSavingsAccount() {
+        SavingsAccount created = new SavingsAccount();
         created.setAccountBalance(BigDecimal.ZERO.setScale(2));
-        when(currentAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(null, null, created);
-        when(savingsAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(existing, null);
-        when(currentAccountDao.save(any(CurrentAccount.class))).thenReturn(created);
+        when(accountNumberService.next()).thenReturn(54321);
+        when(savingsAccountDao.findByAccountNumber(54321)).thenReturn(created);
+        when(savingsAccountDao.save(any(SavingsAccount.class))).thenReturn(created);
 
-        assertEquals(created, accountService.createCurrentAccount());
+        assertEquals(created, accountService.createSavingsAccount());
+        verify(accountNumberService).next();
     }
 
     @Test

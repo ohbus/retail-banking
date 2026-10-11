@@ -11,13 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import xyz.subho.retail.banking.dao.RoleDao;
 import xyz.subho.retail.banking.dao.UserDao;
-import xyz.subho.retail.banking.dao.CurrentAccountDao;
-import xyz.subho.retail.banking.dao.SavingsAccountDao;
 import xyz.subho.retail.banking.model.User;
-import xyz.subho.retail.banking.model.CurrentAccount;
-import xyz.subho.retail.banking.model.SavingsAccount;
 import xyz.subho.retail.banking.security.Role;
 import xyz.subho.retail.banking.security.UserRole;
+import xyz.subho.retail.banking.service.AccountNumberService;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,10 +37,7 @@ class UserServiceImplTest {
     private RoleDao roleDao;
 
     @Mock
-    private CurrentAccountDao currentAccountDao;
-
-    @Mock
-    private SavingsAccountDao savingsAccountDao;
+    private AccountNumberService accountNumberService;
 
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
@@ -116,7 +110,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void accountNumberGenerationRetriesOnCollision() {
+    void usesReservedNumbersForBothAccounts() {
         User user = new User();
         user.setUsername("newuser");
         user.setPassword("password");
@@ -124,31 +118,13 @@ class UserServiceImplTest {
         UserRole userRole = new UserRole(user, role);
         when(userDao.findByUsername("newuser")).thenReturn(null);
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
-        when(currentAccountDao.findByAccountNumber(any(Integer.class)))
-                .thenReturn(new CurrentAccount(), null, null);
-        when(savingsAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(null);
+        when(accountNumberService.next()).thenReturn(12345, 54321);
         when(userDao.save(any(User.class))).thenReturn(user);
 
         userService.createUser(user, Set.of(userRole));
 
         verify(userDao).save(user);
-    }
-
-    @Test
-    void accountNumberGenerationChecksSavingsAccounts() {
-        User user = new User();
-        user.setUsername("newuser");
-        user.setPassword("password");
-        UserRole userRole = new UserRole(user, new Role());
-        SavingsAccount existing = new SavingsAccount();
-        when(userDao.findByUsername("newuser")).thenReturn(null);
-        when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
-        when(savingsAccountDao.findByAccountNumber(any(Integer.class))).thenReturn(existing, null);
-        when(userDao.save(any(User.class))).thenReturn(user);
-
-        userService.createUser(user, Set.of(userRole));
-
-        verify(userDao).save(user);
+        verify(accountNumberService, times(2)).next();
     }
 
     @Test

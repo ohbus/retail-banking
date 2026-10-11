@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: retail-banking-account-number-registry-1
+      author: retail-banking
+      changes:
+        - createTable:
+            tableName: account_number_registry
+            columns:
+              - column:
+                  name: account_number
+                  type: INT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: account_number_registryPK
+        - sql:
+            sql: INSERT INTO account_number_registry (account_number) SELECT account_number FROM current_account
+        - sql:
+            sql: INSERT INTO account_number_registry (account_number) SELECT account_number FROM savings_account

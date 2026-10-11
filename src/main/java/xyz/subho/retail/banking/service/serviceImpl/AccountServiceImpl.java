@@ -3,8 +3,6 @@ package xyz.subho.retail.banking.service.serviceImpl;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.Date;
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +14,7 @@ import xyz.subho.retail.banking.model.SavingsAccount;
 import xyz.subho.retail.banking.model.SavingsTransaction;
 import xyz.subho.retail.banking.model.User;
 import xyz.subho.retail.banking.service.AccountService;
+import xyz.subho.retail.banking.service.AccountNumberService;
 import xyz.subho.retail.banking.service.TransactionService;
 import xyz.subho.retail.banking.service.UserService;
 
@@ -27,20 +26,22 @@ public class AccountServiceImpl implements AccountService {
     private final SavingsAccountDao savingsAccountDao;
     private final UserService userService;
     private final TransactionService transactionService;
+    private final AccountNumberService accountNumberService;
 
     public AccountServiceImpl(CurrentAccountDao currentAccountDao, SavingsAccountDao savingsAccountDao,
-            UserService userService, TransactionService transactionService) {
+            UserService userService, TransactionService transactionService, AccountNumberService accountNumberService) {
         this.currentAccountDao = currentAccountDao;
         this.savingsAccountDao = savingsAccountDao;
         this.userService = userService;
         this.transactionService = transactionService;
+        this.accountNumberService = accountNumberService;
     }
 
     public CurrentAccount createCurrentAccount() {
     	
         CurrentAccount currentAccount = new CurrentAccount();
         currentAccount.setAccountBalance(BigDecimal.ZERO.setScale(2));
-        currentAccount.setAccountNumber(accountGen());
+        currentAccount.setAccountNumber(accountNumberService.next());
 
         currentAccountDao.save(currentAccount);
 
@@ -52,7 +53,7 @@ public class AccountServiceImpl implements AccountService {
     	
         SavingsAccount savingsAccount = new SavingsAccount();
         savingsAccount.setAccountBalance(BigDecimal.ZERO.setScale(2));
-        savingsAccount.setAccountNumber(accountGen());
+        savingsAccount.setAccountNumber(accountNumberService.next());
 
         savingsAccountDao.save(savingsAccount);
 
@@ -117,15 +118,6 @@ public class AccountServiceImpl implements AccountService {
             
         }
         
-    }
-
-    private int accountGen() {
-        int accountNumber;
-        do {
-            accountNumber = ThreadLocalRandom.current().nextInt(2323, 232321474);
-        } while (currentAccountDao.findByAccountNumber(accountNumber) != null
-                || savingsAccountDao.findByAccountNumber(accountNumber) != null);
-        return accountNumber;
     }
 
     private BigDecimal validateAmount(String accountType, BigDecimal amount) {

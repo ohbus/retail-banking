@@ -2,8 +2,6 @@ package xyz.subho.retail.banking.service.serviceImpl;
 
 import java.math.BigDecimal;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-
 import xyz.subho.retail.banking.model.CurrentAccount;
 import xyz.subho.retail.banking.model.SavingsAccount;
 
@@ -16,12 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import xyz.subho.retail.banking.dao.RoleDao;
-import xyz.subho.retail.banking.dao.CurrentAccountDao;
-import xyz.subho.retail.banking.dao.SavingsAccountDao;
 import xyz.subho.retail.banking.dao.UserDao;
 import xyz.subho.retail.banking.model.User;
 import xyz.subho.retail.banking.security.UserRole;
 import xyz.subho.retail.banking.service.UserService;
+import xyz.subho.retail.banking.service.AccountNumberService;
 
 @Service
 @Transactional
@@ -31,16 +28,14 @@ public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
     private final RoleDao roleDao;
-    private final CurrentAccountDao currentAccountDao;
-    private final SavingsAccountDao savingsAccountDao;
+    private final AccountNumberService accountNumberService;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserDao userDao, RoleDao roleDao, CurrentAccountDao currentAccountDao,
-            SavingsAccountDao savingsAccountDao, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserDao userDao, RoleDao roleDao, AccountNumberService accountNumberService,
+            BCryptPasswordEncoder passwordEncoder) {
         this.userDao = userDao;
         this.roleDao = roleDao;
-        this.currentAccountDao = currentAccountDao;
-        this.savingsAccountDao = savingsAccountDao;
+        this.accountNumberService = accountNumberService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -87,12 +82,12 @@ public class UserServiceImpl implements UserService {
 
             CurrentAccount currentAccount = new CurrentAccount();
             currentAccount.setAccountBalance(BigDecimal.ZERO.setScale(2));
-            currentAccount.setAccountNumber(accountGen());
+            currentAccount.setAccountNumber(accountNumberService.next());
             user.setCurrentAccount(currentAccount);
 
             SavingsAccount savingsAccount = new SavingsAccount();
             savingsAccount.setAccountBalance(BigDecimal.ZERO.setScale(2));
-            savingsAccount.setAccountNumber(accountGen());
+            savingsAccount.setAccountNumber(accountNumberService.next());
             user.setSavingsAccount(savingsAccount);
 
             localUser = userDao.save(user);
@@ -150,13 +145,4 @@ public class UserServiceImpl implements UserService {
         
     }
 
-    private int accountGen() {
-        int accountNumber;
-        do {
-            accountNumber = ThreadLocalRandom.current().nextInt(2323, 232321474);
-        } while (currentAccountDao.findByAccountNumber(accountNumber) != null
-                || savingsAccountDao.findByAccountNumber(accountNumber) != null);
-        return accountNumber;
-    }
-    
 }
