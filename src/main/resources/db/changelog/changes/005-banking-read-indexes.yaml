@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: retail-banking-read-indexes-1
+      author: retail-banking
+      changes:
+        - createIndex:
+            tableName: current_transaction
+            indexName: IDX_CURRENT_TRANSACTION_ACCOUNT_DATE_ID
+            columns:
+              - column:
+                  name: current_account_id
+              - column:
+                  name: date
+              - column:
+                  name: id
+        - createIndex:
+            tableName: savings_transaction
+            indexName: IDX_SAVINGS_TRANSACTION_ACCOUNT_DATE_ID
+            columns:
+              - column:
+                  name: savings_account_id
+              - column:
+                  name: date
+              - column:
+                  name: id
+        - createIndex:
+            tableName: recipient
+            indexName: IDX_RECIPIENT_USER_ID
+            columns:
+              - column:
+                  name: user_id
