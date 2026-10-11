@@ -64,14 +64,14 @@
                 <tbody>
                 <tr data-th-each="eachRecipient : ${recipientList}">
                     <td><a data-th-text="${eachRecipient.name}"
-                           th:href="@{/transfer/recipient/edit?recipientName=}+${eachRecipient.name}">...</a></td>
+                           th:href="@{/transfer/recipient/edit(recipientId=${eachRecipient.id})}">...</a></td>
                     <td data-th-text="${eachRecipient.email}">...</td>
                     <td data-th-text="${eachRecipient.phone}">...</td>
                     <td data-th-text="${eachRecipient.accountNumber}">...</td>
                     <td data-th-text="${eachRecipient.description}">...</td>
                     <td>
                         <form th:action="@{/transfer/recipient/delete}" method="post">
-                            <input type="hidden" name="recipientName" th:value="${eachRecipient.name}"/>
+                            <input type="hidden" name="recipientId" th:value="${eachRecipient.id}"/>
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                             <button type="submit" class="btn btn-link">delete</button>
                         </form>

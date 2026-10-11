@@ -77,7 +77,7 @@ public class AccountController {
     public String depositPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType,
                               Principal principal, Model model) {
         try {
-            accountService.deposit(accountType, new BigDecimal(amount), principal);
+            accountService.deposit(accountType, parseAmount(amount), principal);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("error", exception.getMessage());
             model.addAttribute("accountType", accountType);
@@ -103,7 +103,7 @@ public class AccountController {
     public String withdrawPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType,
                                Principal principal, Model model) {
         try {
-            accountService.withdraw(accountType, new BigDecimal(amount), principal);
+            accountService.withdraw(accountType, parseAmount(amount), principal);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("error", exception.getMessage());
             model.addAttribute("accountType", accountType);
@@ -113,6 +113,14 @@ public class AccountController {
 
         return "redirect:/userFront";
         
+    }
+
+    private BigDecimal parseAmount(String amount) {
+        try {
+            return new BigDecimal(amount);
+        } catch (NumberFormatException | NullPointerException exception) {
+            throw new IllegalArgumentException("Amount is invalid", exception);
+        }
     }
     
 }

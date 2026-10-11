@@ -45,13 +45,21 @@ public class TransferController {
             @ModelAttribute("transferFrom") String transferFrom,
             @ModelAttribute("transferTo") String transferTo,
             @ModelAttribute("amount") String amount,
-            Principal principal
+            Principal principal,
+            Model model
     ) {
-    	
-        User user = userService.findByUsername(principal.getName());
-        CurrentAccount currentAccount = user.getCurrentAccount();
-        SavingsAccount savingsAccount = user.getSavingsAccount();
-        transactionService.betweenAccountsTransfer(transferFrom, transferTo, amount, currentAccount, savingsAccount);
+        try {
+            User user = userService.findByUsername(principal.getName());
+            CurrentAccount currentAccount = user.getCurrentAccount();
+            SavingsAccount savingsAccount = user.getSavingsAccount();
+            transactionService.betweenAccountsTransfer(transferFrom, transferTo, amount, currentAccount, savingsAccount);
+        } catch (IllegalArgumentException exception) {
+            model.addAttribute("error", exception.getMessage());
+            model.addAttribute("transferFrom", transferFrom);
+            model.addAttribute("transferTo", transferTo);
+            model.addAttribute("amount", amount);
+            return "betweenAccounts";
+        }
 
         return "redirect:/userFront";
         
@@ -83,9 +91,9 @@ public class TransferController {
     }
 
     @RequestMapping(value = "/recipient/edit", method = RequestMethod.GET)
-    public String recipientEdit(@RequestParam(value = "recipientName") String recipientName, Model model, Principal principal) {
+    public String recipientEdit(@RequestParam(value = "recipientId") Long recipientId, Model model, Principal principal) {
 
-        Recipient recipient = transactionService.findRecipientByName(recipientName, principal.getName());
+        Recipient recipient = transactionService.findRecipientById(recipientId, principal.getName());
         List<Recipient> recipientList = transactionService.findRecipientList(principal);
 
         model.addAttribute("recipientList", recipientList);
@@ -96,9 +104,9 @@ public class TransferController {
     }
 
     @RequestMapping(value = "/recipient/delete", method = RequestMethod.POST)
-    public String recipientDelete(@RequestParam(value = "recipientName") String recipientName, Model model, Principal principal) {
+    public String recipientDelete(@RequestParam(value = "recipientId") Long recipientId, Model model, Principal principal) {
 
-        transactionService.deleteRecipientByName(recipientName, principal.getName());
+        transactionService.deleteRecipientById(recipientId, principal.getName());
 
         List<Recipient> recipientList = transactionService.findRecipientList(principal);
 
@@ -119,10 +127,23 @@ public class TransferController {
     }
 
     @RequestMapping(value = "/toSomeoneElse", method = RequestMethod.POST)
-    public String toSomeoneElsePost(@ModelAttribute("recipientName") String recipientName, @ModelAttribute("accountType") String accountType, @ModelAttribute("amount") String amount, Principal principal) {
-        User user = userService.findByUsername(principal.getName());
-        Recipient recipient = transactionService.findRecipientByName(recipientName, principal.getName());
-        transactionService.toSomeoneElseTransfer(recipient, accountType, amount, user.getCurrentAccount(), user.getSavingsAccount());
+    public String toSomeoneElsePost(@ModelAttribute("recipientId") Long recipientId,
+                                    @ModelAttribute("accountType") String accountType,
+                                    @ModelAttribute("amount") String amount,
+                                    Principal principal, Model model) {
+        try {
+            User user = userService.findByUsername(principal.getName());
+            Recipient recipient = transactionService.findRecipientById(recipientId, principal.getName());
+            transactionService.toSomeoneElseTransfer(recipient, accountType, amount,
+                    user.getCurrentAccount(), user.getSavingsAccount());
+        } catch (IllegalArgumentException exception) {
+            model.addAttribute("error", exception.getMessage());
+            model.addAttribute("recipientList", transactionService.findRecipientList(principal));
+            model.addAttribute("recipientId", recipientId);
+            model.addAttribute("accountType", accountType);
+            model.addAttribute("amount", amount);
+            return "toSomeoneElse";
+        }
         return "redirect:/userFront";
     }
     

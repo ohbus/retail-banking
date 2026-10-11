@@ -62,6 +62,14 @@ class AccountControllerTest {
     }
 
     @Test
+    void missingDepositAmountReturnsFormAndDoesNotMutate() {
+        String result = controller.depositPOST(null, "Current", principal, new ExtendedModelMap());
+
+        assertEquals("deposit", result);
+        verify(accountService, never()).deposit(anyString(), any(), any());
+    }
+
+    @Test
     void rejectedWithdrawalReturnsFormWithError() {
         doThrow(new IllegalArgumentException("Insufficient funds"))
                 .when(accountService).withdraw("Savings", new BigDecimal("10.00"), principal);

@@ -12,7 +12,7 @@ public interface RecipientDao extends CrudRepository<Recipient, Long> {
 
     List<Recipient> findByUserUsername(String username);
 
-    Recipient findByNameAndUserUsername(String recipientName, String username);
+    Recipient findByIdAndUserUsername(Long recipientId, String username);
 
-    void deleteByNameAndUserUsername(String recipientName, String username);
+    void deleteByIdAndUserUsername(Long recipientId, String username);
 }

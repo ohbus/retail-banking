@@ -88,7 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     public void betweenAccountsTransfer(String transferFrom, String transferTo, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount) {
         BigDecimal value = validateAmount(amount);
-        if (transferFrom.equalsIgnoreCase("Current") && transferTo.equalsIgnoreCase("Savings")) {
+        if ("Current".equalsIgnoreCase(transferFrom) && "Savings".equalsIgnoreCase(transferTo)) {
             requireFunds(currentAccount.getAccountBalance(), value);
             currentAccount.setAccountBalance(currentAccount.getAccountBalance().subtract(value));
             savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().add(value));
@@ -100,7 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
             CurrentTransaction currentTransaction = new CurrentTransaction(date, "Between account transfer from " + transferFrom + " to " + transferTo, "Account", "Finished", value, currentAccount.getAccountBalance(), currentAccount);
             currentTransactionDao.save(currentTransaction);
             
-        } else if (transferFrom.equalsIgnoreCase("Savings") && transferTo.equalsIgnoreCase("Current")) {
+        } else if ("Savings".equalsIgnoreCase(transferFrom) && "Current".equalsIgnoreCase(transferTo)) {
         	
             requireFunds(savingsAccount.getAccountBalance(), value);
             currentAccount.setAccountBalance(currentAccount.getAccountBalance().add(value));
@@ -146,13 +146,13 @@ public class TransactionServiceImpl implements TransactionService {
         
     }
 
-    public Recipient findRecipientByName(String recipientName, String username) {
-        return recipientDao.findByNameAndUserUsername(recipientName, username);
+    public Recipient findRecipientById(Long recipientId, String username) {
+        return recipientDao.findByIdAndUserUsername(recipientId, username);
         
     }
 
-    public void deleteRecipientByName(String recipientName, String username) {
-        recipientDao.deleteByNameAndUserUsername(recipientName, username);
+    public void deleteRecipientById(Long recipientId, String username) {
+        recipientDao.deleteByIdAndUserUsername(recipientId, username);
         
     }
 
@@ -172,7 +172,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (recipientCurrentAccount == null && recipientSavingsAccount == null) {
             throw new IllegalArgumentException("Recipient account was not found");
         }
-        if (accountType.equalsIgnoreCase("Current")) {
+        if ("Current".equalsIgnoreCase(accountType)) {
             if (sameAccount(recipientCurrentAccount, currentAccount)) {
                 throw new IllegalArgumentException("Source and recipient accounts must differ");
             }
@@ -194,7 +194,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             CurrentTransaction currentTransaction = new CurrentTransaction(date, "Transfer to recipient " + recipient.getName(), "Transfer", "Finished", value, currentAccount.getAccountBalance(), currentAccount);
             currentTransactionDao.save(currentTransaction);
-        } else if (accountType.equalsIgnoreCase("Savings")) {
+        } else if ("Savings".equalsIgnoreCase(accountType)) {
             if (sameAccount(recipientSavingsAccount, savingsAccount)) {
                 throw new IllegalArgumentException("Source and recipient accounts must differ");
             }
@@ -222,6 +222,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private BigDecimal validateAmount(String amount) {
+        if (amount == null) {
+            throw new IllegalArgumentException("Amount is invalid");
+        }
         try {
             BigDecimal value = new BigDecimal(amount);
             if (value.signum() <= 0 || value.scale() > 2) {

@@ -218,21 +218,21 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void findRecipientByName() {
+    void findRecipientById() {
         Recipient recipient = new Recipient();
-        when(recipientDao.findByNameAndUserUsername("testRecipient", "testuser")).thenReturn(recipient);
+        when(recipientDao.findByIdAndUserUsername(1L, "testuser")).thenReturn(recipient);
 
-        Recipient foundRecipient = transactionService.findRecipientByName("testRecipient", "testuser");
+        Recipient foundRecipient = transactionService.findRecipientById(1L, "testuser");
 
         assertNotNull(foundRecipient);
-        verify(recipientDao, times(1)).findByNameAndUserUsername("testRecipient", "testuser");
+        verify(recipientDao, times(1)).findByIdAndUserUsername(1L, "testuser");
     }
 
     @Test
-    void deleteRecipientByName() {
-        doNothing().when(recipientDao).deleteByNameAndUserUsername("testRecipient", "testuser");
-        transactionService.deleteRecipientByName("testRecipient", "testuser");
-        verify(recipientDao, times(1)).deleteByNameAndUserUsername("testRecipient", "testuser");
+    void deleteRecipientById() {
+        doNothing().when(recipientDao).deleteByIdAndUserUsername(1L, "testuser");
+        transactionService.deleteRecipientById(1L, "testuser");
+        verify(recipientDao, times(1)).deleteByIdAndUserUsername(1L, "testuser");
     }
 
     @Test
@@ -411,6 +411,28 @@ class TransactionServiceImplTest {
         when(currentAccountDao.findByAccountNumber(12345)).thenReturn(source);
         assertThrows(IllegalArgumentException.class,
                 () -> transactionService.toSomeoneElseTransfer(recipient, "Current", "1.00", source, savings));
+    }
+
+    @Test
+    void rejectsNullTransferTypesWithoutThrowingNullPointerException() {
+        CurrentAccount currentAccount = new CurrentAccount();
+        currentAccount.setAccountBalance(new BigDecimal("10.00"));
+        SavingsAccount savingsAccount = new SavingsAccount();
+        savingsAccount.setAccountBalance(new BigDecimal("10.00"));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> transactionService.betweenAccountsTransfer(null, "Savings", "1.00",
+                        currentAccount, savingsAccount));
+        assertThrows(IllegalArgumentException.class,
+                () -> transactionService.toSomeoneElseTransfer(new Recipient(), null, "1.00",
+                        currentAccount, savingsAccount));
+    }
+
+    @Test
+    void rejectsNullTransferAmount() {
+        assertThrows(IllegalArgumentException.class,
+                () -> transactionService.toSomeoneElseTransfer(new Recipient(), "Current", null,
+                        new CurrentAccount(), new SavingsAccount()));
     }
 
     @Test

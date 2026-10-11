@@ -8,12 +8,12 @@
         <div class="col-md-6">
             <form th:action="@{/transfer/toSomeoneElse}" method="post">
                 <div class="form-group">
-                    <label for="recipientName">1. Please select the recipient you would like to transfer To:</label>
-                    <select class="form-control" th:value="${recipientName}" name="recipientName" id="recipientName" required="required">
+                    <label for="recipientId">1. Please select the recipient you would like to transfer To:</label>
+                    <select class="form-control" th:value="${recipientId}" name="recipientId" id="recipientId" required="required">
                         <option disabled="disabled" selected="selected"> -- select a recipient -- </option>
-                        <tr th:each="recipient : ${recipientList}">
-                            <option th:text="${recipient.name}"></option>
-                        </tr>
+                        <option th:each="recipient : ${recipientList}"
+                                th:value="${recipient.id}"
+                                th:text="${recipient.name}"></option>
                     </select>
                     <br />
                 </div>

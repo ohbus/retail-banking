@@ -29,9 +29,9 @@ public interface TransactionService {
 
     Recipient saveRecipient(Recipient recipient, String username);
 
-    Recipient findRecipientByName(String recipientName, String username);
+    Recipient findRecipientById(Long recipientId, String username);
 
-    void deleteRecipientByName(String recipientName, String username);
+    void deleteRecipientById(Long recipientId, String username);
 
     void toSomeoneElseTransfer(Recipient recipient, String accountType, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount);
 
