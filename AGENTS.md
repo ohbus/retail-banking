@@ -17,6 +17,8 @@ This is a Spring Boot 3.4/Maven application using Java 21, Thymeleaf, Spring Sec
 - `docker compose -f docker-compose.prod.yml up -d --build` — run the production-like Compose setup.
 - `mvn liquibase:diff -Dliquibase.diffChangeLogFile=src/main/resources/db/changelog/changes/<version>-<description>.yaml` — generate a migration after entity changes.
 
+For local debugging, the `dev` profile logs `xyz.subho.retail.banking` at `DEBUG`. Add a temporary `logging.level.<package>=DEBUG` entry to `src/main/resources/application-dev.properties` for a narrower area; keep SQL bind logging disabled unless values are safe to expose.
+
 ## Coding Style & Naming Conventions
 
 Use standard Java style: 4 spaces, Unix line endings, explicit imports, camelCase methods/variables, and PascalCase classes. Keep Spring layers in their existing packages and name implementations with the `Impl` suffix. Add Javadoc to public classes and methods.

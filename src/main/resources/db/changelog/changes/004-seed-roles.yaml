@@ -7,6 +7,10 @@ databaseChangeLog:
             sql: INSERT INTO role (role_id, name) SELECT 1, 'ROLE_USER' WHERE NOT EXISTS (SELECT 1 FROM role WHERE name = 'ROLE_USER')
         - sql:
             sql: INSERT INTO role (role_id, name) SELECT 2, 'ROLE_ADMIN' WHERE NOT EXISTS (SELECT 1 FROM role WHERE name = 'ROLE_ADMIN')
+        - addNotNullConstraint:
+            tableName: role
+            columnName: name
+            columnDataType: VARCHAR(255)
         - addUniqueConstraint:
             tableName: role
             columnNames: name

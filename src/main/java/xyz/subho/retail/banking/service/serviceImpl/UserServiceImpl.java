@@ -23,7 +23,7 @@ import xyz.subho.retail.banking.service.AccountNumberService;
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserDao userDao;
     private final AccountNumberService accountNumberService;
@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
         user.setEnabled(false);
         logger.info("user status : {}", user.isEnabled());
         userDao.save(user);
-        logger.info(username, "{}, is disabled.");
+        logger.info("{}, is disabled.", username);
         
     }
 
