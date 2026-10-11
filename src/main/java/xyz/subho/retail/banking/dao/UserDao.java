@@ -1,7 +1,5 @@
 package xyz.subho.retail.banking.dao;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
@@ -13,8 +11,6 @@ public interface UserDao extends CrudRepository<User, Long> {
     User findByUsername(String username);
 
     User findByEmail(String email);
-
-    List<User> findAll();
 
     Page<User> findAll(Pageable pageable);
     

@@ -8,8 +8,6 @@ import xyz.subho.retail.banking.model.Recipient;
 
 public interface RecipientDao extends CrudRepository<Recipient, Long> {
 
-    List<Recipient> findAll();
-
     List<Recipient> findByUserUsername(String username);
 
     Recipient findByIdAndUserUsername(Long recipientId, String username);

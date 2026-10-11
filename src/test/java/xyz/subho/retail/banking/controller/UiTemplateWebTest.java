@@ -36,6 +36,7 @@ import xyz.subho.retail.banking.model.User;
 import xyz.subho.retail.banking.service.AccountService;
 import xyz.subho.retail.banking.service.TransactionService;
 import xyz.subho.retail.banking.service.UserService;
+import xyz.subho.retail.banking.security.SessionInvalidationService;
 import xyz.subho.retail.banking.service.serviceImpl.UserSecurityServiceImpl;
 
 @WebMvcTest(controllers = {
@@ -66,6 +67,9 @@ class UiTemplateWebTest {
 
     @MockBean
     private RoleDao roleDao;
+
+    @MockBean
+    private SessionInvalidationService sessionInvalidationService;
 
     private User user;
 
