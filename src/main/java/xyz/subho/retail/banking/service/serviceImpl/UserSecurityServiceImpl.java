@@ -2,7 +2,6 @@ package xyz.subho.retail.banking.service.serviceImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,8 +15,11 @@ public class UserSecurityServiceImpl implements UserDetailsService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserSecurityServiceImpl.class);
 
-    @Autowired
-    private UserDao userDao;
+    private final UserDao userDao;
+
+    public UserSecurityServiceImpl(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

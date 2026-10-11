@@ -10,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Version;
+import jakarta.persistence.Column;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -19,8 +21,13 @@ public class SavingsAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, unique = true)
     private int accountNumber;
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal accountBalance;
+
+    @Version
+    private long version;
 
     @OneToMany(mappedBy = "savingsAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

@@ -57,7 +57,13 @@
 
 
 <div th:replace="common/header :: body-bottom-scripts"/>
-<script>
+<script th:inline="javascript">
+	function addCsrfField(form) {
+		const csrfField = document.createElement('input');
+		csrfField.name = /*[[${_csrf.parameterName}]]*/ '_csrf';
+		csrfField.value = /*[[${_csrf.token}]]*/ '';
+		form.appendChild(csrfField);
+	}
 
 	function showSavingsAcc(uname)	{
 		
@@ -70,6 +76,7 @@
 		hiddenField.value = uname;
 		
 		form.appendChild(hiddenField);
+		addCsrfField(form);
 		
 		document.body.appendChild(form);
 		form.submit();
@@ -87,6 +94,7 @@
 		hiddenField.value = uname;
 		
 		form.appendChild(hiddenField);
+		addCsrfField(form);
 		
 		document.body.appendChild(form);
 		form.submit();
@@ -110,6 +118,7 @@
 		hiddenField.value = uname;
 		
 		form.appendChild(hiddenField);
+		addCsrfField(form);
 		
 		document.body.appendChild(form);
 		form.submit();

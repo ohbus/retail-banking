@@ -4,8 +4,8 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.error.ErrorController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +24,15 @@ import xyz.subho.retail.banking.service.UserService;
 public class HomeController {
 
 	private static final String PATH = "/error";
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final RoleDao roleDao;
 
-    @Autowired
-    private RoleDao roleDao;
+    public HomeController(UserService userService, RoleDao roleDao) {
+        this.userService = userService;
+        this.roleDao = roleDao;
+    }
 
     @RequestMapping("/")
     public String home() {
@@ -56,7 +59,6 @@ public class HomeController {
         
     }
 
-    @SuppressWarnings("finally")
 	@PostMapping("/signup")
     public String signupPost(@ModelAttribute("user") User user, Model model) {
 
@@ -77,21 +79,18 @@ public class HomeController {
             return "signup";
             
         } else {
-        	try	{
+            try {
         	
 	            Set<UserRole> userRoles = new HashSet<>();
 	            userRoles.add(new UserRole(user, roleDao.findByName("ROLE_USER")));
 	
 	            userService.createUser(user, userRoles);
-        	}
-        	catch(Exception e)	{
+	            return "redirect:/";
+	        } catch (Exception e) {
         		model.addAttribute("errorSignUp", true);
-        		e.printStackTrace();
-        	}
-        	finally	{
-        		model.addAttribute("successSignUp", true);
-        		return "redirect:/";
-        	}
+	            logger.error("Unable to create user {}", user.getUsername(), e);
+	            return "signup";
+	        }
             
         }
         

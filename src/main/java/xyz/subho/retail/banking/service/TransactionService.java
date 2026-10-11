@@ -23,15 +23,15 @@ public interface TransactionService {
 
     void saveSavingsWithdrawTransaction(SavingsTransaction savingsTransaction);
 
-    void betweenAccountsTransfer(String transferFrom, String transferTo, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount) throws Exception;
+    void betweenAccountsTransfer(String transferFrom, String transferTo, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount);
 
     List<Recipient> findRecipientList(Principal principal);
 
-    Recipient saveRecipient(Recipient recipient);
+    Recipient saveRecipient(Recipient recipient, String username);
 
-    Recipient findRecipientByName(String recipientName);
+    Recipient findRecipientByName(String recipientName, String username);
 
-    void deleteRecipientByName(String recipientName);
+    void deleteRecipientByName(String recipientName, String username);
 
     void toSomeoneElseTransfer(Recipient recipient, String accountType, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount);
 

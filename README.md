@@ -52,8 +52,12 @@ To start the application in a development environment, you can use the provided 
     docker compose -f docker-compose.dev.yml up -d
     ```
 2.  **Run the application from your IDE:**
+    *   Copy `.env.example` to `.env` and replace every placeholder with a secret.
+    *   Export `SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/bank_dev`,
+        `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, and
+        `SECURITY_REMEMBER_ME_KEY` before starting the application.
     *   Open the project in your favorite IDE (e.g., IntelliJ IDEA).
-    *   Run the `Application` class. The `dev` profile is active by default.
+    *   Run the `Application` class. The `dev` profile is active by default and validates the Liquibase schema.
 
 The application will be available at `http://localhost:9998`.
 
@@ -65,7 +69,7 @@ To run the application in a production-like environment, use the following comma
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-This will start the application and a MySQL database container in detached mode.
+Set the variables from `.env` first. The database is not published to the host in this profile; the application uses the dedicated `MYSQL_USER` account.
 
 ## Database Migrations
 
@@ -90,6 +94,8 @@ To run all tests, use the following command:
 ```sh
 mvn clean verify
 ```
+
+The full suite needs Docker for Testcontainers. For fast local feedback without Docker, run the unit and MVC tests with `mvn -Dtest="**/*Test,!ApplicationTests" test`.
 
 ## Contributing
 

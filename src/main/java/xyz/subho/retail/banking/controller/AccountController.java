@@ -1,9 +1,9 @@
 package xyz.subho.retail.banking.controller;
 
 import java.security.Principal;
+import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,14 +23,16 @@ import xyz.subho.retail.banking.service.UserService;
 @RequestMapping("/account")
 public class AccountController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final AccountService accountService;
+    private final TransactionService transactionService;
 
-    @Autowired
-    private AccountService accountService;
-
-    @Autowired
-    private TransactionService transactionService;
+    public AccountController(UserService userService, AccountService accountService,
+            TransactionService transactionService) {
+        this.userService = userService;
+        this.accountService = accountService;
+        this.transactionService = transactionService;
+    }
 
     @RequestMapping("/currentAccount")
     public String currentAccount(Model model, Principal principal) {
@@ -72,9 +74,16 @@ public class AccountController {
     }
 
     @RequestMapping(value = "/deposit", method = RequestMethod.POST)
-    public String depositPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType, Principal principal) {
-        
-    	accountService.deposit(accountType, Double.parseDouble(amount), principal);
+    public String depositPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType,
+                              Principal principal, Model model) {
+        try {
+            accountService.deposit(accountType, new BigDecimal(amount), principal);
+        } catch (IllegalArgumentException exception) {
+            model.addAttribute("error", exception.getMessage());
+            model.addAttribute("accountType", accountType);
+            model.addAttribute("amount", amount);
+            return "deposit";
+        }
 
         return "redirect:/userFront";
         
@@ -91,9 +100,16 @@ public class AccountController {
     }
 
     @RequestMapping(value = "/withdraw", method = RequestMethod.POST)
-    public String withdrawPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType, Principal principal) {
-        
-    	accountService.withdraw(accountType, Double.parseDouble(amount), principal);
+    public String withdrawPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType,
+                               Principal principal, Model model) {
+        try {
+            accountService.withdraw(accountType, new BigDecimal(amount), principal);
+        } catch (IllegalArgumentException exception) {
+            model.addAttribute("error", exception.getMessage());
+            model.addAttribute("accountType", accountType);
+            model.addAttribute("amount", amount);
+            return "withdraw";
+        }
 
         return "redirect:/userFront";
         

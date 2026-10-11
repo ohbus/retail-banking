@@ -1,16 +1,20 @@
 package xyz.subho.retail.banking.service.serviceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import xyz.subho.retail.banking.model.User;
 import xyz.subho.retail.banking.service.UserService;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@Disabled
 class AdminServiceImplTest {
 
     @InjectMocks
@@ -26,11 +30,25 @@ class AdminServiceImplTest {
 
     @Test
     void deactivateAccount() {
-        // The current implementation of deactivateAccount in AdminServiceImpl is incomplete
-        // and always returns false. This test reflects that behavior.
-        // Once the deactivateAccount method is fully implemented, this test should be updated.
         String username = "testuser";
+        User user = new User();
+        user.setEnabled(true);
+        when(userService.findByUsername(username)).thenReturn(user);
         boolean result = adminService.deactivateAccount(username);
-        assertFalse(result);
+        assertTrue(result);
+        assertFalse(user.isEnabled());
+        verify(userService).saveUser(user);
+    }
+
+    @Test
+    void deactivateAccountReturnsFalseForMissingOrAlreadyDisabledUser() {
+        when(userService.findByUsername("missing")).thenReturn(null);
+        assertFalse(adminService.deactivateAccount("missing"));
+
+        User user = new User();
+        user.setEnabled(false);
+        when(userService.findByUsername("disabled")).thenReturn(user);
+        assertFalse(adminService.deactivateAccount("disabled"));
+        verify(userService, never()).saveUser(any(User.class));
     }
 }

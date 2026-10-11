@@ -2,7 +2,6 @@ package xyz.subho.retail.banking.controller;
 
 import java.security.Principal;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +16,11 @@ import xyz.subho.retail.banking.service.UserService;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/profile")
     public String profile(Principal principal, Model model) {
@@ -32,10 +34,9 @@ public class UserController {
     }
 
     @PostMapping("/profile")
-    public String profilePost(@ModelAttribute("user") User newUser, Model model) {
+    public String profilePost(@ModelAttribute("user") User newUser, Model model, Principal principal) {
     	
-        User user = userService.findByUsername(newUser.getUsername());
-        user.setUsername(newUser.getUsername());
+        User user = userService.findByUsername(principal.getName());
         user.setFirstName(newUser.getFirstName());
         user.setLastName(newUser.getLastName());
         user.setAadhaarId(newUser.getAadhaarId());

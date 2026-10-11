@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Column;
 
 @Entity
 public class CurrentTransaction {
@@ -20,7 +21,8 @@ public class CurrentTransaction {
     private String description;
     private String type;
     private String status;
-    private double amount;
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal amount;
     private BigDecimal availableBalance;
     @ManyToOne
     @JoinColumn(name = "current_account_id")
@@ -30,7 +32,7 @@ public class CurrentTransaction {
     public CurrentTransaction() {
     }
 
-    public CurrentTransaction(Date date, String description, String type, String status, double amount, BigDecimal availableBalance, CurrentAccount currentAccount) {
+    public CurrentTransaction(Date date, String description, String type, String status, BigDecimal amount, BigDecimal availableBalance, CurrentAccount currentAccount) {
         this.date = date;
         this.description = description;
         this.type = type;
@@ -80,11 +82,11 @@ public class CurrentTransaction {
         this.status = status;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

@@ -86,6 +86,7 @@
                 </div>
 
                 <div class="form-group ">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <button type="submit" class="btn btn-primary btn-block ">Change Settings
                     </button>
                 </div>
@@ -120,7 +121,7 @@
 
 <div th:replace="common/header :: body-bottom-scripts"/>
 
-<script>
+<script th:inline="javascript">
 
 	function changeStatus(uname)	{
 		
@@ -133,8 +134,12 @@
 		const hiddenField = document.createElement('input');
 		hiddenField.name  = 'username';
 		hiddenField.value = uname;
+		const csrfField = document.createElement('input');
+		csrfField.name = /*[[${_csrf.parameterName}]]*/ '_csrf';
+		csrfField.value = /*[[${_csrf.token}]]*/ '';
 		
 		form.appendChild(hiddenField);
+		form.appendChild(csrfField);
 		
 		document.body.appendChild(form);
 		form.submit();

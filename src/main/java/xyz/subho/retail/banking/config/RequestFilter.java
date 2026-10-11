@@ -1,5 +1,7 @@
 package xyz.subho.retail.banking.config;
 
+import java.io.IOException;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -17,7 +19,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestFilter implements Filter {
 
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
 
@@ -28,13 +31,8 @@ public class RequestFilter implements Filter {
         response.setHeader("Access-Control-Allow-Credentials", "true");
 
         if (!(request.getMethod().equalsIgnoreCase("OPTIONS"))) {
-            try {
-                chain.doFilter(req, res);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            chain.doFilter(req, res);
         } else {
-            System.out.println("Pre-flight");
             response.setHeader("Access-Control-Allow-Methods", "POST,GET,DELETE");
             response.setHeader("Access-Control-Max-Age", "3600");
             response.setHeader("Access-Control-Allow-Headers", "authorization, content-type," +

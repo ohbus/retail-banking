@@ -8,7 +8,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest
+@SpringBootTest(properties = "security.remember-me-key=test-only-remember-me-key")
 @Testcontainers
 class ApplicationTests {
 

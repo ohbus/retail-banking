@@ -4,10 +4,9 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import xyz.subho.retail.banking.dao.CurrentAccountDao;
 import xyz.subho.retail.banking.dao.CurrentTransactionDao;
@@ -24,25 +23,26 @@ import xyz.subho.retail.banking.service.TransactionService;
 import xyz.subho.retail.banking.service.UserService;
 
 @Service
+@Transactional
 public class TransactionServiceImpl implements TransactionService {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final CurrentTransactionDao currentTransactionDao;
+    private final SavingsTransactionDao savingsTransactionDao;
+    private final CurrentAccountDao currentAccountDao;
+    private final SavingsAccountDao savingsAccountDao;
+    private final RecipientDao recipientDao;
 
-    @Autowired
-    private CurrentTransactionDao currentTransactionDao;
-
-    @Autowired
-    private SavingsTransactionDao savingsTransactionDao;
-
-    @Autowired
-    private CurrentAccountDao currentAccountDao;
-
-    @Autowired
-    private SavingsAccountDao savingsAccountDao;
-
-    @Autowired
-    private RecipientDao recipientDao;
+    public TransactionServiceImpl(UserService userService, CurrentTransactionDao currentTransactionDao,
+            SavingsTransactionDao savingsTransactionDao, CurrentAccountDao currentAccountDao,
+            SavingsAccountDao savingsAccountDao, RecipientDao recipientDao) {
+        this.userService = userService;
+        this.currentTransactionDao = currentTransactionDao;
+        this.savingsTransactionDao = savingsTransactionDao;
+        this.currentAccountDao = currentAccountDao;
+        this.savingsAccountDao = savingsAccountDao;
+        this.recipientDao = recipientDao;
+    }
 
 
     public List<CurrentTransaction> findCurrentTransactionList(String username) {
@@ -86,34 +86,36 @@ public class TransactionServiceImpl implements TransactionService {
         
     }
 
-    public void betweenAccountsTransfer(String transferFrom, String transferTo, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount) throws Exception {
-    	
+    public void betweenAccountsTransfer(String transferFrom, String transferTo, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount) {
+        BigDecimal value = validateAmount(amount);
         if (transferFrom.equalsIgnoreCase("Current") && transferTo.equalsIgnoreCase("Savings")) {
-            currentAccount.setAccountBalance(currentAccount.getAccountBalance().subtract(new BigDecimal(amount)));
-            savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().add(new BigDecimal(amount)));
+            requireFunds(currentAccount.getAccountBalance(), value);
+            currentAccount.setAccountBalance(currentAccount.getAccountBalance().subtract(value));
+            savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().add(value));
             currentAccountDao.save(currentAccount);
             savingsAccountDao.save(savingsAccount);
 
             Date date = new Date();
 
-            CurrentTransaction currentTransaction = new CurrentTransaction(date, "Between account transfer from " + transferFrom + " to " + transferTo, "Account", "Finished", Double.parseDouble(amount), currentAccount.getAccountBalance(), currentAccount);
+            CurrentTransaction currentTransaction = new CurrentTransaction(date, "Between account transfer from " + transferFrom + " to " + transferTo, "Account", "Finished", value, currentAccount.getAccountBalance(), currentAccount);
             currentTransactionDao.save(currentTransaction);
             
         } else if (transferFrom.equalsIgnoreCase("Savings") && transferTo.equalsIgnoreCase("Current")) {
         	
-            currentAccount.setAccountBalance(currentAccount.getAccountBalance().add(new BigDecimal(amount)));
-            savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().subtract(new BigDecimal(amount)));
+            requireFunds(savingsAccount.getAccountBalance(), value);
+            currentAccount.setAccountBalance(currentAccount.getAccountBalance().add(value));
+            savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().subtract(value));
             currentAccountDao.save(currentAccount);
             savingsAccountDao.save(savingsAccount);
 
             Date date = new Date();
 
-            SavingsTransaction savingsTransaction = new SavingsTransaction(date, "Between account transfer from " + transferFrom + " to " + transferTo, "Transfer", "Finished", Double.parseDouble(amount), savingsAccount.getAccountBalance(), savingsAccount);
+            SavingsTransaction savingsTransaction = new SavingsTransaction(date, "Between account transfer from " + transferFrom + " to " + transferTo, "Transfer", "Finished", value, savingsAccount.getAccountBalance(), savingsAccount);
             savingsTransactionDao.save(savingsTransaction);
             
         } else {
         	
-            throw new Exception("Invalid Transfer");
+            throw new IllegalArgumentException("Invalid Transfer");
             
         }
         
@@ -121,51 +123,146 @@ public class TransactionServiceImpl implements TransactionService {
 
     public List<Recipient> findRecipientList(Principal principal) {
     	
-        String username = principal.getName();
-        List<Recipient> recipientList = recipientDao.findAll().stream()
-                .filter(recipient -> username.equals(recipient.getUser().getUsername()))
-                .collect(Collectors.toList());
-
-        return recipientList;
+        return recipientDao.findByUserUsername(principal.getName());
         
     }
 
-    public Recipient saveRecipient(Recipient recipient) {
-    	
+    public Recipient saveRecipient(Recipient recipient, String username) {
+        if (recipient.getId() != null) {
+            Recipient existing = recipientDao.findById(recipient.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Recipient not found"));
+            if (existing.getUser() == null || !username.equals(existing.getUser().getUsername())) {
+                throw new IllegalArgumentException("Recipient does not belong to the current user");
+            }
+            existing.setName(recipient.getName());
+            existing.setEmail(recipient.getEmail());
+            existing.setPhone(recipient.getPhone());
+            existing.setAccountNumber(recipient.getAccountNumber());
+            existing.setDescription(recipient.getDescription());
+            return recipientDao.save(existing);
+        }
+        recipient.setUser(userService.findByUsername(username));
         return recipientDao.save(recipient);
         
     }
 
-    public Recipient findRecipientByName(String recipientName) {
-    	
-        return recipientDao.findByName(recipientName);
+    public Recipient findRecipientByName(String recipientName, String username) {
+        return recipientDao.findByNameAndUserUsername(recipientName, username);
         
     }
 
-    public void deleteRecipientByName(String recipientName) {
-    	
-        recipientDao.deleteByName(recipientName);
+    public void deleteRecipientByName(String recipientName, String username) {
+        recipientDao.deleteByNameAndUserUsername(recipientName, username);
         
     }
 
     public void toSomeoneElseTransfer(Recipient recipient, String accountType, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount) {
+        BigDecimal value = validateAmount(amount);
+        if (recipient == null || recipient.getAccountNumber() == null) {
+            throw new IllegalArgumentException("Recipient account is required");
+        }
+        int recipientAccountNumber;
+        try {
+            recipientAccountNumber = Integer.parseInt(recipient.getAccountNumber());
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("Recipient account is invalid", exception);
+        }
+        CurrentAccount recipientCurrentAccount = currentAccountDao.findByAccountNumber(recipientAccountNumber);
+        SavingsAccount recipientSavingsAccount = savingsAccountDao.findByAccountNumber(recipientAccountNumber);
+        if (recipientCurrentAccount == null && recipientSavingsAccount == null) {
+            throw new IllegalArgumentException("Recipient account was not found");
+        }
         if (accountType.equalsIgnoreCase("Current")) {
-            currentAccount.setAccountBalance(currentAccount.getAccountBalance().subtract(new BigDecimal(amount)));
+            if (sameAccount(recipientCurrentAccount, currentAccount)) {
+                throw new IllegalArgumentException("Source and recipient accounts must differ");
+            }
+            requireFunds(currentAccount.getAccountBalance(), value);
+            currentAccount.setAccountBalance(currentAccount.getAccountBalance().subtract(value));
+            if (recipientCurrentAccount != null) {
+                recipientCurrentAccount.setAccountBalance(recipientCurrentAccount.getAccountBalance().add(value));
+            } else {
+                recipientSavingsAccount.setAccountBalance(recipientSavingsAccount.getAccountBalance().add(value));
+            }
             currentAccountDao.save(currentAccount);
+            if (recipientCurrentAccount != null) {
+                currentAccountDao.save(recipientCurrentAccount);
+            } else {
+                savingsAccountDao.save(recipientSavingsAccount);
+            }
 
             Date date = new Date();
 
-            CurrentTransaction currentTransaction = new CurrentTransaction(date, "Transfer to recipient " + recipient.getName(), "Transfer", "Finished", Double.parseDouble(amount), currentAccount.getAccountBalance(), currentAccount);
+            CurrentTransaction currentTransaction = new CurrentTransaction(date, "Transfer to recipient " + recipient.getName(), "Transfer", "Finished", value, currentAccount.getAccountBalance(), currentAccount);
             currentTransactionDao.save(currentTransaction);
         } else if (accountType.equalsIgnoreCase("Savings")) {
-            savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().subtract(new BigDecimal(amount)));
+            if (sameAccount(recipientSavingsAccount, savingsAccount)) {
+                throw new IllegalArgumentException("Source and recipient accounts must differ");
+            }
+            requireFunds(savingsAccount.getAccountBalance(), value);
+            savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().subtract(value));
+            if (recipientCurrentAccount != null) {
+                recipientCurrentAccount.setAccountBalance(recipientCurrentAccount.getAccountBalance().add(value));
+            } else {
+                recipientSavingsAccount.setAccountBalance(recipientSavingsAccount.getAccountBalance().add(value));
+            }
             savingsAccountDao.save(savingsAccount);
+            if (recipientCurrentAccount != null) {
+                currentAccountDao.save(recipientCurrentAccount);
+            } else {
+                savingsAccountDao.save(recipientSavingsAccount);
+            }
 
             Date date = new Date();
 
-            SavingsTransaction savingsTransaction = new SavingsTransaction(date, "Transfer to recipient " + recipient.getName(), "Transfer", "Finished", Double.parseDouble(amount), savingsAccount.getAccountBalance(), savingsAccount);
+            SavingsTransaction savingsTransaction = new SavingsTransaction(date, "Transfer to recipient " + recipient.getName(), "Transfer", "Finished", value, savingsAccount.getAccountBalance(), savingsAccount);
             savingsTransactionDao.save(savingsTransaction);
+        } else {
+            throw new IllegalArgumentException("Invalid account type");
         }
+    }
+
+    private BigDecimal validateAmount(String amount) {
+        try {
+            BigDecimal value = new BigDecimal(amount);
+            if (value.signum() <= 0 || value.scale() > 2) {
+                throw new IllegalArgumentException("Amount must be positive with at most two decimal places");
+            }
+            return value.setScale(2);
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("Amount is invalid", exception);
+        }
+    }
+
+    private void requireFunds(BigDecimal balance, BigDecimal amount) {
+        if (balance == null || balance.compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Insufficient funds");
+        }
+    }
+
+    private boolean sameAccount(CurrentAccount first, CurrentAccount second) {
+        if (first == null || second == null) {
+            return false;
+        }
+        if (first == second) {
+            return true;
+        }
+        if (first.getId() != null && second.getId() != null) {
+            return first.getId().equals(second.getId());
+        }
+        return first.getAccountNumber() == second.getAccountNumber();
+    }
+
+    private boolean sameAccount(SavingsAccount first, SavingsAccount second) {
+        if (first == null || second == null) {
+            return false;
+        }
+        if (first == second) {
+            return true;
+        }
+        if (first.getId() != null && second.getId() != null) {
+            return first.getId().equals(second.getId());
+        }
+        return first.getAccountNumber() == second.getAccountNumber();
     }
     
 }

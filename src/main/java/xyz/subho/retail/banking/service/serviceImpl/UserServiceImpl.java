@@ -1,5 +1,6 @@
 package xyz.subho.retail.banking.service.serviceImpl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -9,16 +10,16 @@ import xyz.subho.retail.banking.model.SavingsAccount;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import xyz.subho.retail.banking.dao.RoleDao;
+import xyz.subho.retail.banking.dao.CurrentAccountDao;
+import xyz.subho.retail.banking.dao.SavingsAccountDao;
 import xyz.subho.retail.banking.dao.UserDao;
 import xyz.subho.retail.banking.model.User;
 import xyz.subho.retail.banking.security.UserRole;
-import xyz.subho.retail.banking.service.AccountService;
 import xyz.subho.retail.banking.service.UserService;
 
 @Service
@@ -27,14 +28,20 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    @Autowired
-    private UserDao userDao;
+    private final UserDao userDao;
+    private final RoleDao roleDao;
+    private final CurrentAccountDao currentAccountDao;
+    private final SavingsAccountDao savingsAccountDao;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RoleDao roleDao;
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    public UserServiceImpl(UserDao userDao, RoleDao roleDao, CurrentAccountDao currentAccountDao,
+            SavingsAccountDao savingsAccountDao, BCryptPasswordEncoder passwordEncoder) {
+        this.userDao = userDao;
+        this.roleDao = roleDao;
+        this.currentAccountDao = currentAccountDao;
+        this.savingsAccountDao = savingsAccountDao;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     
 
@@ -78,12 +85,12 @@ public class UserServiceImpl implements UserService {
             user.getUserRoles().addAll(userRoles);
 
             CurrentAccount currentAccount = new CurrentAccount();
-            currentAccount.setAccountBalance(new java.math.BigDecimal(0.0));
+            currentAccount.setAccountBalance(BigDecimal.ZERO.setScale(2));
             currentAccount.setAccountNumber(accountGen());
             user.setCurrentAccount(currentAccount);
 
             SavingsAccount savingsAccount = new SavingsAccount();
-            savingsAccount.setAccountBalance(new java.math.BigDecimal(0.0));
+            savingsAccount.setAccountBalance(BigDecimal.ZERO.setScale(2));
             savingsAccount.setAccountNumber(accountGen());
             user.setSavingsAccount(savingsAccount);
 
@@ -96,7 +103,7 @@ public class UserServiceImpl implements UserService {
 
     public boolean checkUserExists(String username, String email) {
     	
-        return checkUsernameExists(username) || checkEmailExists(username);
+        return checkUsernameExists(username) || checkEmailExists(email);
         
     }
 
@@ -144,9 +151,12 @@ public class UserServiceImpl implements UserService {
     }
 
     private int accountGen() {
-    	
-        return ThreadLocalRandom.current().nextInt(2323, 232321474);
-        
+        int accountNumber;
+        do {
+            accountNumber = ThreadLocalRandom.current().nextInt(2323, 232321474);
+        } while (currentAccountDao.findByAccountNumber(accountNumber) != null
+                || savingsAccountDao.findByAccountNumber(accountNumber) != null);
+        return accountNumber;
     }
     
 }

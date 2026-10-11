@@ -6,8 +6,10 @@ services:
     ports:
       - "3307:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=bank
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: bank
+      MYSQL_USER: ${MYSQL_USER:-bank_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD}
     networks:
       - spring-app-network
 
@@ -19,7 +21,11 @@ services:
     ports:
       - "9998:9998"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-standalone:3306/bank
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-bank_app}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD}
+      SECURITY_REMEMBER_ME_KEY: ${SECURITY_REMEMBER_ME_KEY:?set SECURITY_REMEMBER_ME_KEY}
     volumes:
       - .:/app
     depends_on:

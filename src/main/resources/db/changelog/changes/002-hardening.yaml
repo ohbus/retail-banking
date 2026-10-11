@@ -1,0 +1,57 @@
+databaseChangeLog:
+  - changeSet:
+      id: retail-banking-hardening-1
+      author: retail-banking
+      changes:
+        - addColumn:
+            tableName: current_account
+            columns:
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addColumn:
+            tableName: savings_account
+            columns:
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: retail-banking-hardening-2
+      author: retail-banking
+      changes:
+        - modifyDataType:
+            tableName: current_transaction
+            columnName: amount
+            newDataType: DECIMAL(19, 2)
+        - modifyDataType:
+            tableName: savings_transaction
+            columnName: amount
+            newDataType: DECIMAL(19, 2)
+
+  - changeSet:
+      id: retail-banking-hardening-3
+      author: retail-banking
+      changes:
+        - addNotNullConstraint:
+            tableName: user
+            columnName: username
+            columnDataType: VARCHAR(255)
+        - addUniqueConstraint:
+            tableName: user
+            columnNames: username
+            constraintName: UC_USERNAME
+        - addUniqueConstraint:
+            tableName: current_account
+            columnNames: account_number
+            constraintName: UC_CURRENT_ACCOUNT_NUMBER
+        - addUniqueConstraint:
+            tableName: savings_account
+            columnNames: account_number
+            constraintName: UC_SAVINGS_ACCOUNT_NUMBER

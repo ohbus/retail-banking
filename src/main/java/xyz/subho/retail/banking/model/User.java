@@ -33,6 +33,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userId", nullable = false, updatable = false)
     private Long userId;
+    @Column(nullable = false, unique = true)
     private String username;
     private String password;
     private String firstName;
@@ -151,14 +152,6 @@ public class User implements UserDetails {
         return "User{" +
                 "userId=" + userId +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", recipientList=" + recipientList +
-                ", userRoles=" + userRoles +
-                ", aadhaarId='" + aadhaarId + '\'' +
                 '}';
     }
 
