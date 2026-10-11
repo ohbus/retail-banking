@@ -4,6 +4,7 @@ import java.security.Principal;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +38,7 @@ public class UserController {
     public String profilePost(@ModelAttribute("user") User newUser, Model model, Principal principal) {
     	
         User user = userService.findByUsername(principal.getName());
+        String existingEmail = user.getEmail();
         user.setFirstName(newUser.getFirstName());
         user.setLastName(newUser.getLastName());
         user.setAadhaarId(newUser.getAadhaarId());
@@ -45,7 +47,12 @@ public class UserController {
 
         model.addAttribute("user", user);
 
-        userService.saveUser(user);
+        try {
+            userService.saveUser(user);
+        } catch (DataIntegrityViolationException exception) {
+            user.setEmail(existingEmail);
+            model.addAttribute("emailExists", true);
+        }
 
         return "profile";
         

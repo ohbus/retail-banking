@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.ui.ExtendedModelMap;
 
 import xyz.subho.retail.banking.model.User;
@@ -42,5 +43,23 @@ class UserControllerTest {
         assertEquals("Updated", authenticated.getFirstName());
         verify(userService).findByUsername("alice");
         verify(userService).saveUser(authenticated);
+    }
+
+    @Test
+    void duplicateProfileEmailReturnsFormAndRestoresExistingEmail() {
+        User authenticated = new User();
+        authenticated.setUsername("alice");
+        authenticated.setEmail("alice@example.com");
+        User submitted = new User();
+        submitted.setEmail("taken@example.com");
+        Principal principal = () -> "alice";
+        ExtendedModelMap model = new ExtendedModelMap();
+        when(userService.findByUsername("alice")).thenReturn(authenticated);
+        org.mockito.Mockito.doThrow(new DataIntegrityViolationException("duplicate email"))
+                .when(userService).saveUser(authenticated);
+
+        assertEquals("profile", controller.profilePost(submitted, model, principal));
+        assertEquals("alice@example.com", authenticated.getEmail());
+        assertEquals(true, model.getAttribute("emailExists"));
     }
 }
