@@ -85,9 +85,10 @@ public class AdminController {
 
 	@RequestMapping("/currentAccount")
 	@PreAuthorize("hasRole('ADMIN')")
-	public String currentAccount(@ModelAttribute("username") String uname, Model model) {
+	public String currentAccount(@ModelAttribute("username") String uname, Model model,
+			@RequestParam(defaultValue = "0") int page) {
 		Page<CurrentTransaction> currentTransactionPage = transactionService
-				.findCurrentTransactionPage(uname, PageRequest.of(0, TRANSACTIONS_PER_PAGE));
+				.findCurrentTransactionPage(uname, PageRequest.of(Math.max(page, 0), TRANSACTIONS_PER_PAGE));
 
 		User user = userService.findByUsername(uname);
 		CurrentAccount currentAccount = user.getCurrentAccount();
@@ -95,6 +96,8 @@ public class AdminController {
 		model.addAttribute("currentAccount", currentAccount);
 		model.addAttribute("currentTransactionList", currentTransactionPage.getContent());
 		model.addAttribute("currentTransactionPage", currentTransactionPage);
+		model.addAttribute("adminView", true);
+		model.addAttribute("viewedUsername", uname);
 
 		return "currentAccount";
 
@@ -102,15 +105,18 @@ public class AdminController {
 
 	@RequestMapping("/savingsAccount")
 	@PreAuthorize("hasRole('ADMIN')")
-	public String savingsAccount(@ModelAttribute("username") String uname, Model model) {
+	public String savingsAccount(@ModelAttribute("username") String uname, Model model,
+			@RequestParam(defaultValue = "0") int page) {
 		Page<SavingsTransaction> savingsTransactionPage = transactionService
-				.findSavingsTransactionPage(uname, PageRequest.of(0, TRANSACTIONS_PER_PAGE));
+				.findSavingsTransactionPage(uname, PageRequest.of(Math.max(page, 0), TRANSACTIONS_PER_PAGE));
 		User user = userService.findByUsername(uname);
 		SavingsAccount savingsAccount = user.getSavingsAccount();
 
 		model.addAttribute("savingsAccount", savingsAccount);
 		model.addAttribute("savingsTransactionList", savingsTransactionPage.getContent());
 		model.addAttribute("savingsTransactionPage", savingsTransactionPage);
+		model.addAttribute("adminView", true);
+		model.addAttribute("viewedUsername", uname);
 
 		return "savingsAccount";
 

@@ -6,6 +6,7 @@
 <div class="container main">
     <div class="row">
         <div class="col-md-6">
+            <div class="bg-danger" th:if="${error}" th:text="${error}"></div>
             <form th:action="@{/transfer/toSomeoneElse}" method="post">
                 <div class="form-group">
                     <label for="recipientId">1. Please select the recipient you would like to transfer To:</label>

@@ -49,6 +49,7 @@ public class AccountController {
         model.addAttribute("currentAccount", currentAccount);
         model.addAttribute("currentTransactionList", currentTransactionPage.getContent());
         model.addAttribute("currentTransactionPage", currentTransactionPage);
+        model.addAttribute("adminView", false);
 
         return "currentAccount";
         
@@ -65,6 +66,7 @@ public class AccountController {
         model.addAttribute("savingsAccount", savingsAccount);
         model.addAttribute("savingsTransactionList", savingsTransactionPage.getContent());
         model.addAttribute("savingsTransactionPage", savingsTransactionPage);
+        model.addAttribute("adminView", false);
 
         return "savingsAccount";
         
