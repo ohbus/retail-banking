@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: retail-banking-seed-roles-1
+      author: retail-banking
+      changes:
+        - sql:
+            sql: INSERT INTO role (role_id, name) SELECT 1, 'ROLE_USER' WHERE NOT EXISTS (SELECT 1 FROM role WHERE name = 'ROLE_USER')
+        - sql:
+            sql: INSERT INTO role (role_id, name) SELECT 2, 'ROLE_ADMIN' WHERE NOT EXISTS (SELECT 1 FROM role WHERE name = 'ROLE_ADMIN')
+        - addUniqueConstraint:
+            tableName: role
+            columnNames: name
+            constraintName: UC_ROLE_NAME

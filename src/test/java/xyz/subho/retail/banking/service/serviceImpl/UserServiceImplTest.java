@@ -9,7 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import xyz.subho.retail.banking.dao.RoleDao;
 import xyz.subho.retail.banking.dao.UserDao;
 import xyz.subho.retail.banking.model.User;
 import xyz.subho.retail.banking.security.Role;
@@ -32,9 +31,6 @@ class UserServiceImplTest {
 
     @Mock
     private UserDao userDao;
-
-    @Mock
-    private RoleDao roleDao;
 
     @Mock
     private AccountNumberService accountNumberService;
@@ -94,7 +90,6 @@ class UserServiceImplTest {
         assertNotNull(createdUser.getCurrentAccount());
         assertNotNull(createdUser.getSavingsAccount());
         verify(userDao, times(1)).save(user);
-        verify(roleDao, times(1)).save(role);
     }
 
     @Test
