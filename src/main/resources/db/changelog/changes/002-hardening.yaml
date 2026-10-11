@@ -55,3 +55,12 @@ databaseChangeLog:
             tableName: savings_account
             columnNames: account_number
             constraintName: UC_SAVINGS_ACCOUNT_NUMBER
+
+  - changeSet:
+      id: retail-banking-hardening-4
+      author: retail-banking
+      changes:
+        - addAutoIncrement:
+            tableName: user_role
+            columnName: user_role_id
+            columnDataType: BIGINT

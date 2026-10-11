@@ -46,10 +46,10 @@ public class User implements UserDetails {
 
     private boolean enabled = true;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private CurrentAccount currentAccount;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private SavingsAccount savingsAccount;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

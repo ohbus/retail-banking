@@ -16,7 +16,7 @@ import xyz.subho.retail.banking.model.User;
 public class UserRole {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userRoleId;
 
     @ManyToOne(fetch = FetchType.EAGER)
