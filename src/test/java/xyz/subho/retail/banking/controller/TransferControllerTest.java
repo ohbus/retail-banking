@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.ExtendedModelMap;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 import xyz.subho.retail.banking.model.Recipient;
 import xyz.subho.retail.banking.model.User;
@@ -94,5 +95,19 @@ class TransferControllerTest {
         assertEquals("toSomeoneElse",
                 controller.toSomeoneElsePost(1L, "Current", "bad", principal, model));
         assertEquals("Amount is invalid", model.getAttribute("error"));
+    }
+
+    @Test
+    void concurrentBetweenAccountTransferReturnsRetryableFormError() {
+        Principal principal = () -> "alice";
+        User user = new User();
+        when(userService.findByUsername("alice")).thenReturn(user);
+        doThrow(new OptimisticLockingFailureException("conflict")).when(transactionService)
+                .betweenAccountsTransfer("Current", "Savings", "10.00", null, null);
+        ExtendedModelMap model = new ExtendedModelMap();
+
+        assertEquals("betweenAccounts",
+                controller.betweenAccountsPost("Current", "Savings", "10.00", principal, model));
+        assertEquals("The account changed while processing. Please try again.", model.getAttribute("error"));
     }
 }

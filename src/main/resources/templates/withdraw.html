@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml" lang="en">
-<head th:replace="common/header :: common-header"/>
+<head th:replace="~{common/header :: common-header}"/>
 <body roleId="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
-<head th:replace="common/header :: navbar"/>
+<head th:replace="~{common/header :: navbar}"/>
 <div class="container main">
     <div class="row">
         <div class="col-md-6">
@@ -37,7 +37,7 @@
 </div>
 
 
-<div th:replace="common/header :: body-bottom-scripts"/>
+<div th:replace="~{common/header :: body-bottom-scripts}"/>
 
 </body>
 </html>

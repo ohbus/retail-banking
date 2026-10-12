@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml" lang="en">
-<head th:replace="common/header :: common-header"/>
+<head th:replace="~{common/header :: common-header}"/>
 <body roleId="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
-<!--<head th:replace="common/header :: navbar" />-->
+<!--<head th:replace="~{common/header :: navbar}" />-->
 <div class="container">
     <div class="row main">
         <div class="panel-heading">
@@ -91,7 +91,7 @@
                     <div class="cols-sm-10">
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
-                            <input type="password" class="form-control" th:value="${user.password}" id="password"
+                            <input type="password" class="form-control" id="password"
                                    name="password" roleId="password" placeholder="Enter your Password"
                                    required="required"/>
                         </div>
@@ -131,7 +131,7 @@
 </div>
 
 
-<div th:replace="common/header :: body-bottom-scripts"/>
+<div th:replace="~{common/header :: body-bottom-scripts}"/>
 
 </body>
 </html>

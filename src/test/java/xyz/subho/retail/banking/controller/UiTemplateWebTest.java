@@ -3,6 +3,7 @@ package xyz.subho.retail.banking.controller;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,6 +15,9 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
+
+import org.mockito.ArgumentCaptor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +41,8 @@ import xyz.subho.retail.banking.service.AccountService;
 import xyz.subho.retail.banking.service.TransactionService;
 import xyz.subho.retail.banking.service.UserService;
 import xyz.subho.retail.banking.security.SessionInvalidationService;
+import xyz.subho.retail.banking.security.Role;
+import xyz.subho.retail.banking.security.UserRole;
 import xyz.subho.retail.banking.service.serviceImpl.UserSecurityServiceImpl;
 
 @WebMvcTest(controllers = {
@@ -122,6 +128,36 @@ class UiTemplateWebTest {
     }
 
     @Test
+    void signupCannotBindSensitiveUserFields() throws Exception {
+        Role userRole = new Role();
+        userRole.setName("ROLE_USER");
+        when(userService.checkUserExists("alice", "alice@example.com")).thenReturn(false);
+        when(roleDao.findByName("ROLE_USER")).thenReturn(userRole);
+
+        mockMvc.perform(post("/signup").with(csrf())
+                        .param("username", "alice")
+                        .param("email", "alice@example.com")
+                        .param("password", "password")
+                        .param("userId", "99")
+                        .param("enabled", "false")
+                        .param("currentAccount.accountNumber", "99999")
+                        .param("userRoles[0].role.name", "ROLE_ADMIN"))
+                .andExpect(status().is3xxRedirection());
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Set<UserRole>> rolesCaptor = ArgumentCaptor.forClass(Set.class);
+        verify(userService).createUser(userCaptor.capture(), rolesCaptor.capture());
+        User submitted = userCaptor.getValue();
+        org.junit.jupiter.api.Assertions.assertNull(submitted.getUserId());
+        org.junit.jupiter.api.Assertions.assertTrue(submitted.isEnabled());
+        org.junit.jupiter.api.Assertions.assertNull(submitted.getCurrentAccount());
+        org.junit.jupiter.api.Assertions.assertEquals(1, rolesCaptor.getValue().size());
+        org.junit.jupiter.api.Assertions.assertEquals("ROLE_USER",
+                rolesCaptor.getValue().iterator().next().getRole().getName());
+    }
+
+    @Test
     void rendersDashboardAndAccountPages() throws Exception {
         mockMvc.perform(get("/userFront").with(user("alice").roles("USER")))
                 .andExpect(status().isOk())
@@ -158,7 +194,8 @@ class UiTemplateWebTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("betweenAccounts"))
                 .andExpect(content().string(containsString("/transfer/betweenAccounts")))
-                .andExpect(content().string(containsString("_csrf")));
+                .andExpect(content().string(containsString("_csrf")))
+                .andExpect(content().string(containsString("value=\"Current\">Primary")));
 
         mockMvc.perform(get("/transfer/toSomeoneElse").with(user("alice").roles("USER")))
                 .andExpect(status().isOk())
@@ -206,7 +243,11 @@ class UiTemplateWebTest {
                 .andExpect(content().string(containsString("addCsrfField")))
                 .andExpect(content().string(containsString("/admin/toggleUser")))
                 .andExpect(content().string(containsString("/admin/currentAccount")))
-                .andExpect(content().string(containsString("/admin/savingsAccount")));
+                .andExpect(content().string(containsString("/admin/savingsAccount")))
+                .andExpect(content().string(containsString(
+                        "onclick=\"showCurrentAcc(this.getAttribute(&#39;datausername&#39;))\">Current")))
+                .andExpect(content().string(containsString(
+                        "onclick=\"showSavingsAcc(this.getAttribute(&#39;datausername&#39;))\">Savings")));
 
         mockMvc.perform(get("/admin/signup").with(user("admin").roles("ADMIN")))
                 .andExpect(status().isOk())

@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.ExtendedModelMap;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 import xyz.subho.retail.banking.service.AccountService;
 import xyz.subho.retail.banking.service.TransactionService;
@@ -79,5 +80,17 @@ class AccountControllerTest {
 
         assertEquals("withdraw", result);
         assertEquals("Insufficient funds", model.getAttribute("error"));
+    }
+
+    @Test
+    void concurrentDepositReturnsRetryableFormError() {
+        doThrow(new OptimisticLockingFailureException("conflict"))
+                .when(accountService).deposit("Current", new BigDecimal("10.00"), principal);
+        ExtendedModelMap model = new ExtendedModelMap();
+
+        String result = controller.depositPOST("10.00", "Current", principal, model);
+
+        assertEquals("deposit", result);
+        assertEquals("The account changed while processing. Please try again.", model.getAttribute("error"));
     }
 }

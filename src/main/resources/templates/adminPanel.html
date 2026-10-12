@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml" lang="en">
-<head th:replace="common/header :: common-header"/>
+<head th:replace="~{common/header :: common-header}"/>
 <body roleId="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
-<head th:replace="common/header :: navbar"/>
+<head th:replace="~{common/header :: navbar}"/>
 <style>
 	h1 {text-align: center;}
 </style>
@@ -39,8 +39,8 @@
                 <td data-th-text="${userList.firstName}">...</td>
                 <td data-th-text="${userList.lastName}">...</td>
                 <td>
-                	<button type="button" class="btn btn-primary" th:datausername=${userList.username} th:onclick="|showSavingsAcc(this.getAttribute('datausername'))|">Current</button>
-                	<button type="button" class="btn btn-info" th:datausername=${userList.username} th:onclick="|showCurrentAcc(this.getAttribute('datausername'))|">Savings</button>
+                <button type="button" class="btn btn-primary" th:datausername=${userList.username} th:onclick="|showCurrentAcc(this.getAttribute('datausername'))|">Current</button>
+                <button type="button" class="btn btn-info" th:datausername=${userList.username} th:onclick="|showSavingsAcc(this.getAttribute('datausername'))|">Savings</button>
                 </td>
                 <td data-th-text="${userList.phone}">...</td>
                 <td data-th-text="${userList.email}">...</td>
@@ -63,7 +63,7 @@
 </div>
 
 
-<div th:replace="common/header :: body-bottom-scripts"/>
+<div th:replace="~{common/header :: body-bottom-scripts}"/>
 <script th:inline="javascript">
 	function addCsrfField(form) {
 		const csrfField = document.createElement('input');

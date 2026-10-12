@@ -9,9 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.WebDataBinder;
 
 import xyz.subho.retail.banking.dao.RoleDao;
 import xyz.subho.retail.banking.model.CurrentAccount;
@@ -32,6 +34,12 @@ public class HomeController {
     public HomeController(UserService userService, RoleDao roleDao) {
         this.userService = userService;
         this.roleDao = roleDao;
+    }
+
+    @InitBinder("user")
+    void protectUserFields(WebDataBinder binder) {
+        binder.setDisallowedFields("userId", "enabled", "currentAccount*", "savingsAccount*",
+                "recipientList*", "userRoles*");
     }
 
     @RequestMapping("/")

@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -92,6 +93,11 @@ public class AccountController {
             model.addAttribute("accountType", accountType);
             model.addAttribute("amount", amount);
             return "deposit";
+        } catch (OptimisticLockingFailureException exception) {
+            model.addAttribute("error", "The account changed while processing. Please try again.");
+            model.addAttribute("accountType", accountType);
+            model.addAttribute("amount", amount);
+            return "deposit";
         }
 
         return "redirect:/userFront";
@@ -115,6 +121,11 @@ public class AccountController {
             accountService.withdraw(accountType, parseAmount(amount), principal);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("error", exception.getMessage());
+            model.addAttribute("accountType", accountType);
+            model.addAttribute("amount", amount);
+            return "withdraw";
+        } catch (OptimisticLockingFailureException exception) {
+            model.addAttribute("error", "The account changed while processing. Please try again.");
             model.addAttribute("accountType", accountType);
             model.addAttribute("amount", amount);
             return "withdraw";

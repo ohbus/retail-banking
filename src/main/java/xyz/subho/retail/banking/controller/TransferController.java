@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +56,12 @@ public class TransferController {
             transactionService.betweenAccountsTransfer(transferFrom, transferTo, amount, currentAccount, savingsAccount);
         } catch (IllegalArgumentException exception) {
             model.addAttribute("error", exception.getMessage());
+            model.addAttribute("transferFrom", transferFrom);
+            model.addAttribute("transferTo", transferTo);
+            model.addAttribute("amount", amount);
+            return "betweenAccounts";
+        } catch (OptimisticLockingFailureException exception) {
+            model.addAttribute("error", "The account changed while processing. Please try again.");
             model.addAttribute("transferFrom", transferFrom);
             model.addAttribute("transferTo", transferTo);
             model.addAttribute("amount", amount);
@@ -138,6 +145,13 @@ public class TransferController {
                     user.getCurrentAccount(), user.getSavingsAccount());
         } catch (IllegalArgumentException exception) {
             model.addAttribute("error", exception.getMessage());
+            model.addAttribute("recipientList", transactionService.findRecipientList(principal));
+            model.addAttribute("recipientId", recipientId);
+            model.addAttribute("accountType", accountType);
+            model.addAttribute("amount", amount);
+            return "toSomeoneElse";
+        } catch (OptimisticLockingFailureException exception) {
+            model.addAttribute("error", "The account changed while processing. Please try again.");
             model.addAttribute("recipientList", transactionService.findRecipientList(principal));
             model.addAttribute("recipientId", recipientId);
             model.addAttribute("accountType", accountType);

@@ -11,10 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import xyz.subho.retail.banking.dao.RoleDao;
@@ -47,6 +49,12 @@ public class AdminController {
         this.transactionService = transactionService;
         this.roleDao = roleDao;
         this.sessionInvalidationService = sessionInvalidationService;
+    }
+
+    @InitBinder("user")
+    void protectUserFields(WebDataBinder binder) {
+        binder.setDisallowedFields("userId", "enabled", "currentAccount*", "savingsAccount*",
+                "recipientList*", "userRoles*");
     }
 
 	@GetMapping("/panel")

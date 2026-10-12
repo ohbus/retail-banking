@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml" lang="en">
-<head th:replace="common/header :: common-header"/>
+<head th:replace="~{common/header :: common-header}"/>
 <body roleId="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
-<head th:replace="common/header :: navbar"/>
+<head th:replace="~{common/header :: navbar}"/>
 <div class="container main">
     <div class="row">
         <div class="col-md-6">
@@ -13,7 +13,7 @@
                     <select class="form-control" th:value="${transferFrom}" name="transferFrom" id="transferFrom"
                             required="required">
                         <option disabled="disabled" selected="selected"> -- select your account --</option>
-                        <option value="Primary">Primary</option>
+                        <option value="Current">Primary</option>
                         <option value="Savings">Savings</option>
                     </select>
                     <br/>
@@ -49,7 +49,7 @@
 </div>
 
 
-<div th:replace="common/header :: body-bottom-scripts"/>
+<div th:replace="~{common/header :: body-bottom-scripts}"/>
 
 </body>
 </html>
