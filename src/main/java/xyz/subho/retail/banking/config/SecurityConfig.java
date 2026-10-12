@@ -73,7 +73,7 @@ public class SecurityConfig {
             )
             .rememberMe(rememberMe -> rememberMe.key(rememberMeKey).rememberMeParameter("remember-me"))
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(-1)
                 .sessionRegistry(sessionRegistry()));
 

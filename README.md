@@ -57,7 +57,7 @@ To start the application in a development environment, you can use the provided 
         `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, and
         `SECURITY_REMEMBER_ME_KEY` before starting the application.
     *   Open the project in your favorite IDE (e.g., IntelliJ IDEA).
-    *   Run the `Application` class. The `dev` profile is active by default and validates the Liquibase schema.
+    *   Run the `Application` class with the `dev` profile selected. It validates the Liquibase schema.
 
 The application will be available at `http://localhost:9998`.
 

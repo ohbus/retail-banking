@@ -113,7 +113,8 @@ class UiTemplateWebTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("index"))
                 .andExpect(content().string(containsString("Please sign in")))
-                .andExpect(content().string(containsString("/signup")));
+                .andExpect(content().string(containsString("/signup")))
+                .andExpect(content().string(containsString("_csrf")));
 
         mockMvc.perform(get("/index?error&logout&errorSignUp&successSignUp"))
                 .andExpect(status().isOk())

@@ -64,4 +64,12 @@ class SecurityWebTest {
         mockMvc.perform(get("/admin/panel").with(user("alice").roles("USER")))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    void loginPostRequiresCsrf() throws Exception {
+        mockMvc.perform(post("/index")
+                        .param("username", "alice")
+                        .param("password", "password"))
+                .andExpect(status().isForbidden());
+    }
 }
