@@ -9,11 +9,11 @@
             <form th:action="@{/account/deposit}" method="post">
                 <div class="form-group">
                     <label for="accountType">1. Please select the account you would like to deposit:</label>
-                    <select class="form-control" th:value="${accountType}" name="accountType" id="accountType"
+                    <select class="form-control" name="accountType" id="accountType"
                             required="required">
-                        <option disabled="disabled" selected="selected"> -- select your account --</option>
-                        <option>Current</option>
-                        <option>Savings</option>
+                        <option disabled="disabled" th:selected="${#strings.isEmpty(accountType)}"> -- select your account --</option>
+                        <option th:selected="${accountType == 'Current'}">Current</option>
+                        <option th:selected="${accountType == 'Savings'}">Savings</option>
                     </select>
                     <br/>
                 </div>

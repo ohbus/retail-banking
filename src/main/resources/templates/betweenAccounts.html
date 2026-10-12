@@ -10,22 +10,22 @@
             <form th:action="@{/transfer/betweenAccounts}" method="post">
                 <div class="form-group">
                     <label for="transferFrom">1. Please select the account you would like to transfer From:</label>
-                    <select class="form-control" th:value="${transferFrom}" name="transferFrom" id="transferFrom"
+                    <select class="form-control" name="transferFrom" id="transferFrom"
                             required="required">
-                        <option disabled="disabled" selected="selected"> -- select your account --</option>
-                        <option value="Current">Current</option>
-                        <option value="Savings">Savings</option>
+                        <option disabled="disabled" th:selected="${#strings.isEmpty(transferFrom)}"> -- select your account --</option>
+                        <option value="Current" th:selected="${transferFrom == 'Current'}">Current</option>
+                        <option value="Savings" th:selected="${transferFrom == 'Savings'}">Savings</option>
                     </select>
                     <br/>
                 </div>
 
                 <div class="form-group">
                     <label for="transferTo">2. Please select the account you would like to transfer To:</label>
-                    <select class="form-control" th:value="${transferTo}" name="transferTo" id="transferTo"
+                    <select class="form-control" name="transferTo" id="transferTo"
                             required="required">
-                        <option disabled="disabled" selected="selected"> -- select your account --</option>
-                        <option value="Current">Current</option>
-                        <option value="Savings">Savings</option>
+                        <option disabled="disabled" th:selected="${#strings.isEmpty(transferTo)}"> -- select your account --</option>
+                        <option value="Current" th:selected="${transferTo == 'Current'}">Current</option>
+                        <option value="Savings" th:selected="${transferTo == 'Savings'}">Savings</option>
                     </select>
                     <br/>
                 </div>

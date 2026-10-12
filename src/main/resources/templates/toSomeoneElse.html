@@ -10,10 +10,11 @@
             <form th:action="@{/transfer/toSomeoneElse}" method="post">
                 <div class="form-group">
                     <label for="recipientId">1. Please select the recipient you would like to transfer To:</label>
-                    <select class="form-control" th:value="${recipientId}" name="recipientId" id="recipientId" required="required">
-                        <option disabled="disabled" selected="selected"> -- select a recipient -- </option>
+                    <select class="form-control" name="recipientId" id="recipientId" required="required">
+                        <option disabled="disabled" th:selected="${recipientId == null}"> -- select a recipient -- </option>
                         <option th:each="recipient : ${recipientList}"
                                 th:value="${recipient.id}"
+                                th:selected="${recipientId == recipient.id}"
                                 th:text="${recipient.name}"></option>
                     </select>
                     <br />
@@ -21,10 +22,10 @@
 
                 <div class="form-group">
                     <label for="accountType">2. Please select the account you would like to transfer From:</label>
-                    <select class="form-control" th:value="${accountType}" name="accountType" id="accountType" required="required">
-                        <option disabled="disabled" selected="selected"> -- select your account -- </option>
-                        <option>Current</option>
-                        <option>Savings</option>
+                    <select class="form-control" name="accountType" id="accountType" required="required">
+                        <option disabled="disabled" th:selected="${#strings.isEmpty(accountType)}"> -- select your account -- </option>
+                        <option th:selected="${accountType == 'Current'}">Current</option>
+                        <option th:selected="${accountType == 'Savings'}">Savings</option>
                     </select>
                     <br />
                 </div>

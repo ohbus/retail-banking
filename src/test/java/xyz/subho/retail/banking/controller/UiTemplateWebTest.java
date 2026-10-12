@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -202,6 +203,23 @@ class UiTemplateWebTest {
                 .andExpect(view().name("toSomeoneElse"))
                 .andExpect(content().string(containsString("/transfer/toSomeoneElse")))
                 .andExpect(content().string(containsString("_csrf")));
+    }
+
+    @Test
+    void preservesSelectedAccountsWhenTransferValidationFails() throws Exception {
+        doThrow(new IllegalArgumentException("Amount is invalid")).when(transactionService)
+                .betweenAccountsTransfer(eq("Current"), eq("Savings"), eq("-1.00"), any(), any());
+
+        mockMvc.perform(post("/transfer/betweenAccounts")
+                        .with(user("alice").roles("USER"))
+                        .with(csrf())
+                        .param("transferFrom", "Current")
+                        .param("transferTo", "Savings")
+                        .param("amount", "-1.00"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("betweenAccounts"))
+                .andExpect(content().string(containsString("value=\"Current\" selected=\"selected\"")))
+                .andExpect(content().string(containsString("value=\"Savings\" selected=\"selected\"")));
     }
 
     @Test
