@@ -298,13 +298,21 @@ class TransactionServiceImplTest {
     @Test
     void rejectsInsufficientFundsBeforeMutation() {
         CurrentAccount currentAccount = new CurrentAccount();
+        currentAccount.setAccountNumber(12345);
         currentAccount.setAccountBalance(new BigDecimal("10.00"));
         SavingsAccount savingsAccount = new SavingsAccount();
+        savingsAccount.setAccountNumber(54321);
         savingsAccount.setAccountBalance(new BigDecimal("50.00"));
+        when(currentAccountDao.findByAccountNumberForUpdate(12345)).thenReturn(currentAccount);
+        when(savingsAccountDao.findByAccountNumberForUpdate(54321)).thenReturn(savingsAccount);
 
         assertThrows(IllegalArgumentException.class, () -> transactionService
                 .betweenAccountsTransfer("Current", "Savings", "20.00", currentAccount, savingsAccount));
-        verifyNoInteractions(currentAccountDao, savingsAccountDao, currentTransactionDao, savingsTransactionDao);
+        verify(currentAccountDao).findByAccountNumberForUpdate(12345);
+        verify(savingsAccountDao).findByAccountNumberForUpdate(54321);
+        verify(currentAccountDao, never()).save(any(CurrentAccount.class));
+        verify(savingsAccountDao, never()).save(any(SavingsAccount.class));
+        verifyNoInteractions(currentTransactionDao, savingsTransactionDao);
     }
 
     @Test
@@ -410,6 +418,7 @@ class TransactionServiceImplTest {
         CurrentAccount target = new CurrentAccount();
         target.setAccountNumber(54321);
         when(currentAccountDao.findByAccountNumber(54321)).thenReturn(target);
+        when(currentAccountDao.findByAccountNumberForUpdate(54321)).thenReturn(target);
         when(savingsAccountDao.findByAccountNumber(54321)).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class,
@@ -489,6 +498,7 @@ class TransactionServiceImplTest {
     void transfersBetweenDistinctCurrentAccountsWithIds() {
         CurrentAccount source = new CurrentAccount();
         source.setId(1L);
+        source.setAccountNumber(12345);
         source.setAccountBalance(new BigDecimal("10.00"));
         CurrentAccount target = new CurrentAccount();
         target.setId(2L);
@@ -496,7 +506,10 @@ class TransactionServiceImplTest {
         target.setAccountBalance(new BigDecimal("5.00"));
         Recipient recipient = new Recipient();
         recipient.setAccountNumber("54321");
+        when(currentAccountDao.findByAccountNumber(12345)).thenReturn(source);
         when(currentAccountDao.findByAccountNumber(54321)).thenReturn(target);
+        when(currentAccountDao.findByAccountNumberForUpdate(12345)).thenReturn(source);
+        when(currentAccountDao.findByAccountNumberForUpdate(54321)).thenReturn(target);
 
         transactionService.toSomeoneElseTransfer(recipient, "Current", "1.00",
                 source, new SavingsAccount());
@@ -516,6 +529,7 @@ class TransactionServiceImplTest {
         Recipient recipient = new Recipient();
         recipient.setAccountNumber("54321");
         when(currentAccountDao.findByAccountNumber(54321)).thenReturn(target);
+        when(currentAccountDao.findByAccountNumberForUpdate(54321)).thenReturn(target);
 
         transactionService.toSomeoneElseTransfer(recipient, "Current", "1.00",
                 source, new SavingsAccount());
@@ -534,6 +548,7 @@ class TransactionServiceImplTest {
         Recipient recipient = new Recipient();
         recipient.setAccountNumber("54321");
         when(savingsAccountDao.findByAccountNumber(54321)).thenReturn(target);
+        when(savingsAccountDao.findByAccountNumberForUpdate(54321)).thenReturn(target);
 
         assertThrows(IllegalArgumentException.class,
                 () -> transactionService.toSomeoneElseTransfer(recipient, "Savings", "1.00",
@@ -544,6 +559,7 @@ class TransactionServiceImplTest {
     void transfersBetweenDistinctSavingsAccountsWithIds() {
         SavingsAccount source = new SavingsAccount();
         source.setId(1L);
+        source.setAccountNumber(12345);
         source.setAccountBalance(new BigDecimal("10.00"));
         SavingsAccount target = new SavingsAccount();
         target.setId(2L);
@@ -551,7 +567,10 @@ class TransactionServiceImplTest {
         target.setAccountBalance(new BigDecimal("5.00"));
         Recipient recipient = new Recipient();
         recipient.setAccountNumber("54321");
+        when(savingsAccountDao.findByAccountNumber(12345)).thenReturn(source);
         when(savingsAccountDao.findByAccountNumber(54321)).thenReturn(target);
+        when(savingsAccountDao.findByAccountNumberForUpdate(12345)).thenReturn(source);
+        when(savingsAccountDao.findByAccountNumberForUpdate(54321)).thenReturn(target);
 
         transactionService.toSomeoneElseTransfer(recipient, "Savings", "1.00",
                 new CurrentAccount(), source);
@@ -571,6 +590,7 @@ class TransactionServiceImplTest {
         Recipient recipient = new Recipient();
         recipient.setAccountNumber("54321");
         when(savingsAccountDao.findByAccountNumber(54321)).thenReturn(target);
+        when(savingsAccountDao.findByAccountNumberForUpdate(54321)).thenReturn(target);
 
         transactionService.toSomeoneElseTransfer(recipient, "Savings", "1.00",
                 new CurrentAccount(), source);

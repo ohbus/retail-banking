@@ -84,6 +84,8 @@ public class TransactionServiceImpl implements TransactionService {
     public void betweenAccountsTransfer(String transferFrom, String transferTo, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount) {
         BigDecimal value = validateAmount(amount);
         if ("Current".equalsIgnoreCase(transferFrom) && "Savings".equalsIgnoreCase(transferTo)) {
+            currentAccount = lockCurrentAccount(currentAccount);
+            savingsAccount = lockSavingsAccount(savingsAccount);
             requireFunds(currentAccount.getAccountBalance(), value);
             currentAccount.setAccountBalance(currentAccount.getAccountBalance().subtract(value));
             savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().add(value));
@@ -96,7 +98,8 @@ public class TransactionServiceImpl implements TransactionService {
             currentTransactionDao.save(currentTransaction);
             
         } else if ("Savings".equalsIgnoreCase(transferFrom) && "Current".equalsIgnoreCase(transferTo)) {
-        	
+            currentAccount = lockCurrentAccount(currentAccount);
+            savingsAccount = lockSavingsAccount(savingsAccount);
             requireFunds(savingsAccount.getAccountBalance(), value);
             currentAccount.setAccountBalance(currentAccount.getAccountBalance().add(value));
             savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().subtract(value));
@@ -171,6 +174,14 @@ public class TransactionServiceImpl implements TransactionService {
             if (sameAccount(recipientCurrentAccount, currentAccount)) {
                 throw new IllegalArgumentException("Source and recipient accounts must differ");
             }
+            if (recipientCurrentAccount != null) {
+                CurrentAccount[] lockedAccounts = lockCurrentPair(currentAccount, recipientCurrentAccount);
+                currentAccount = lockedAccounts[0];
+                recipientCurrentAccount = lockedAccounts[1];
+            } else {
+                currentAccount = lockCurrentAccount(currentAccount);
+                recipientSavingsAccount = lockSavingsAccount(recipientSavingsAccount);
+            }
             requireFunds(currentAccount.getAccountBalance(), value);
             currentAccount.setAccountBalance(currentAccount.getAccountBalance().subtract(value));
             if (recipientCurrentAccount != null) {
@@ -192,6 +203,14 @@ public class TransactionServiceImpl implements TransactionService {
         } else if ("Savings".equalsIgnoreCase(accountType)) {
             if (sameAccount(recipientSavingsAccount, savingsAccount)) {
                 throw new IllegalArgumentException("Source and recipient accounts must differ");
+            }
+            if (recipientCurrentAccount != null) {
+                recipientCurrentAccount = lockCurrentAccount(recipientCurrentAccount);
+                savingsAccount = lockSavingsAccount(savingsAccount);
+            } else {
+                SavingsAccount[] lockedAccounts = lockSavingsPair(savingsAccount, recipientSavingsAccount);
+                savingsAccount = lockedAccounts[0];
+                recipientSavingsAccount = lockedAccounts[1];
             }
             requireFunds(savingsAccount.getAccountBalance(), value);
             savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().subtract(value));
@@ -261,6 +280,52 @@ public class TransactionServiceImpl implements TransactionService {
             return first.getId().equals(second.getId());
         }
         return first.getAccountNumber() == second.getAccountNumber();
+    }
+
+    private CurrentAccount lockCurrentAccount(CurrentAccount account) {
+        if (account == null) {
+            throw new IllegalArgumentException("Current account not found");
+        }
+        CurrentAccount locked = currentAccountDao.findByAccountNumberForUpdate(account.getAccountNumber());
+        if (locked != null) {
+            return locked;
+        }
+        if (account.getId() == null) {
+            return account;
+        }
+        throw new IllegalArgumentException("Current account not found");
+    }
+
+    private SavingsAccount lockSavingsAccount(SavingsAccount account) {
+        if (account == null) {
+            throw new IllegalArgumentException("Savings account not found");
+        }
+        SavingsAccount locked = savingsAccountDao.findByAccountNumberForUpdate(account.getAccountNumber());
+        if (locked != null) {
+            return locked;
+        }
+        if (account.getId() == null) {
+            return account;
+        }
+        throw new IllegalArgumentException("Savings account not found");
+    }
+
+    private CurrentAccount[] lockCurrentPair(CurrentAccount first, CurrentAccount second) {
+        if (first.getAccountNumber() <= second.getAccountNumber()) {
+            return new CurrentAccount[] { lockCurrentAccount(first), lockCurrentAccount(second) };
+        }
+        CurrentAccount lockedSecond = lockCurrentAccount(second);
+        CurrentAccount lockedFirst = lockCurrentAccount(first);
+        return new CurrentAccount[] { lockedFirst, lockedSecond };
+    }
+
+    private SavingsAccount[] lockSavingsPair(SavingsAccount first, SavingsAccount second) {
+        if (first.getAccountNumber() <= second.getAccountNumber()) {
+            return new SavingsAccount[] { lockSavingsAccount(first), lockSavingsAccount(second) };
+        }
+        SavingsAccount lockedSecond = lockSavingsAccount(second);
+        SavingsAccount lockedFirst = lockSavingsAccount(first);
+        return new SavingsAccount[] { lockedFirst, lockedSecond };
     }
     
 }

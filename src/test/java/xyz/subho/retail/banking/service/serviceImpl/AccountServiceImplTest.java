@@ -109,12 +109,14 @@ class AccountServiceImplTest {
     void depositCurrentAccount() {
         User user = new User();
         CurrentAccount currentAccount = new CurrentAccount();
+        currentAccount.setAccountNumber(12345);
         currentAccount.setAccountBalance(new BigDecimal("100.00"));
         user.setCurrentAccount(currentAccount);
 
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testuser");
         when(userService.findByUsername("testuser")).thenReturn(user);
+        when(currentAccountDao.findByAccountNumberForUpdate(12345)).thenReturn(currentAccount);
         when(currentAccountDao.save(any(CurrentAccount.class))).thenAnswer(invocation -> invocation.getArgument(0));
         doNothing().when(transactionService).saveCurrentDepositTransaction(any(CurrentTransaction.class));
 
@@ -126,15 +128,41 @@ class AccountServiceImplTest {
     }
 
     @Test
+    void depositMutatesTheLockedPersistedAccount() {
+        User user = new User();
+        CurrentAccount staleAccount = new CurrentAccount();
+        staleAccount.setId(1L);
+        staleAccount.setAccountNumber(12345);
+        staleAccount.setAccountBalance(new BigDecimal("10.00"));
+        CurrentAccount lockedAccount = new CurrentAccount();
+        lockedAccount.setId(1L);
+        lockedAccount.setAccountNumber(12345);
+        lockedAccount.setAccountBalance(new BigDecimal("100.00"));
+        user.setCurrentAccount(staleAccount);
+
+        Principal principal = () -> "testuser";
+        when(userService.findByUsername("testuser")).thenReturn(user);
+        when(currentAccountDao.findByAccountNumberForUpdate(12345)).thenReturn(lockedAccount);
+
+        accountService.deposit("Current", new BigDecimal("50.00"), principal);
+
+        assertEquals(new BigDecimal("10.00"), staleAccount.getAccountBalance());
+        assertEquals(new BigDecimal("150.00"), lockedAccount.getAccountBalance());
+        verify(currentAccountDao).save(lockedAccount);
+    }
+
+    @Test
     void depositSavingsAccount() {
         User user = new User();
         SavingsAccount savingsAccount = new SavingsAccount();
+        savingsAccount.setAccountNumber(54321);
         savingsAccount.setAccountBalance(new BigDecimal("200.00"));
         user.setSavingsAccount(savingsAccount);
 
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testuser");
         when(userService.findByUsername("testuser")).thenReturn(user);
+        when(savingsAccountDao.findByAccountNumberForUpdate(54321)).thenReturn(savingsAccount);
         when(savingsAccountDao.save(any(SavingsAccount.class))).thenAnswer(invocation -> invocation.getArgument(0));
         doNothing().when(transactionService).saveSavingsDepositTransaction(any(SavingsTransaction.class));
 
@@ -149,12 +177,14 @@ class AccountServiceImplTest {
     void withdrawCurrentAccount() {
         User user = new User();
         CurrentAccount currentAccount = new CurrentAccount();
+        currentAccount.setAccountNumber(12345);
         currentAccount.setAccountBalance(new BigDecimal("100.00"));
         user.setCurrentAccount(currentAccount);
 
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testuser");
         when(userService.findByUsername("testuser")).thenReturn(user);
+        when(currentAccountDao.findByAccountNumberForUpdate(12345)).thenReturn(currentAccount);
         when(currentAccountDao.save(any(CurrentAccount.class))).thenAnswer(invocation -> invocation.getArgument(0));
         doNothing().when(transactionService).saveCurrentWithdrawTransaction(any(CurrentTransaction.class));
 
@@ -169,12 +199,14 @@ class AccountServiceImplTest {
     void withdrawSavingsAccount() {
         User user = new User();
         SavingsAccount savingsAccount = new SavingsAccount();
+        savingsAccount.setAccountNumber(54321);
         savingsAccount.setAccountBalance(new BigDecimal("200.00"));
         user.setSavingsAccount(savingsAccount);
 
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testuser");
         when(userService.findByUsername("testuser")).thenReturn(user);
+        when(savingsAccountDao.findByAccountNumberForUpdate(54321)).thenReturn(savingsAccount);
         when(savingsAccountDao.save(any(SavingsAccount.class))).thenReturn(savingsAccount);
         doNothing().when(transactionService).saveSavingsWithdrawTransaction(any(SavingsTransaction.class));
 
@@ -199,15 +231,19 @@ class AccountServiceImplTest {
     void rejectsOverdraft() {
         User user = new User();
         CurrentAccount currentAccount = new CurrentAccount();
+        currentAccount.setAccountNumber(12345);
         currentAccount.setAccountBalance(new BigDecimal("10.00"));
         user.setCurrentAccount(currentAccount);
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testuser");
         when(userService.findByUsername("testuser")).thenReturn(user);
+        when(currentAccountDao.findByAccountNumberForUpdate(12345)).thenReturn(currentAccount);
 
         assertThrows(IllegalArgumentException.class,
                 () -> accountService.withdraw("Current", new BigDecimal("10.01"), principal));
-        verifyNoInteractions(currentAccountDao, transactionService);
+        verify(currentAccountDao).findByAccountNumberForUpdate(12345);
+        verify(currentAccountDao, never()).save(any(CurrentAccount.class));
+        verifyNoInteractions(transactionService);
     }
 
     @Test
@@ -230,12 +266,16 @@ class AccountServiceImplTest {
 
         User user = new User();
         CurrentAccount currentAccount = new CurrentAccount();
+        currentAccount.setAccountNumber(12345);
         user.setCurrentAccount(currentAccount);
         when(principal.getName()).thenReturn("testuser");
         when(userService.findByUsername("testuser")).thenReturn(user);
+        when(currentAccountDao.findByAccountNumberForUpdate(12345)).thenReturn(currentAccount);
 
         assertThrows(IllegalArgumentException.class,
                 () -> accountService.withdraw("Current", new BigDecimal("1.00"), principal));
-        verifyNoInteractions(currentAccountDao, transactionService);
+        verify(currentAccountDao).findByAccountNumberForUpdate(12345);
+        verify(currentAccountDao, never()).save(any(CurrentAccount.class));
+        verifyNoInteractions(transactionService);
     }
 }

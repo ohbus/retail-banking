@@ -67,7 +67,7 @@ public class AccountServiceImpl implements AccountService {
         User user = userService.findByUsername(principal.getName());
 
         if ("Current".equalsIgnoreCase(accountType)) {
-            CurrentAccount currentAccount = user.getCurrentAccount();
+            CurrentAccount currentAccount = lockCurrentAccount(user.getCurrentAccount());
             currentAccount.setAccountBalance(currentAccount.getAccountBalance().add(amount));
             currentAccountDao.save(currentAccount);
 
@@ -78,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
 
         } else {
         	
-            SavingsAccount savingsAccount = user.getSavingsAccount();
+            SavingsAccount savingsAccount = lockSavingsAccount(user.getSavingsAccount());
             savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().add(amount));
             savingsAccountDao.save(savingsAccount);
 
@@ -96,7 +96,7 @@ public class AccountServiceImpl implements AccountService {
         User user = userService.findByUsername(principal.getName());
 
         if ("Current".equalsIgnoreCase(accountType)) {
-            CurrentAccount currentAccount = user.getCurrentAccount();
+            CurrentAccount currentAccount = lockCurrentAccount(user.getCurrentAccount());
             requireFunds(currentAccount.getAccountBalance(), amount);
             currentAccount.setAccountBalance(currentAccount.getAccountBalance().subtract(amount));
             currentAccountDao.save(currentAccount);
@@ -107,7 +107,7 @@ public class AccountServiceImpl implements AccountService {
             transactionService.saveCurrentWithdrawTransaction(currentTransaction);
             
         } else {
-            SavingsAccount savingsAccount = user.getSavingsAccount();
+            SavingsAccount savingsAccount = lockSavingsAccount(user.getSavingsAccount());
             requireFunds(savingsAccount.getAccountBalance(), amount);
             savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().subtract(amount));
             savingsAccountDao.save(savingsAccount);
@@ -134,6 +134,34 @@ public class AccountServiceImpl implements AccountService {
         if (balance == null || balance.compareTo(amount) < 0) {
             throw new IllegalArgumentException("Insufficient funds");
         }
+    }
+
+    private CurrentAccount lockCurrentAccount(CurrentAccount account) {
+        if (account == null) {
+            throw new IllegalArgumentException("Current account not found");
+        }
+        CurrentAccount locked = currentAccountDao.findByAccountNumberForUpdate(account.getAccountNumber());
+        if (locked != null) {
+            return locked;
+        }
+        if (account.getId() == null) {
+            return account;
+        }
+        throw new IllegalArgumentException("Current account not found");
+    }
+
+    private SavingsAccount lockSavingsAccount(SavingsAccount account) {
+        if (account == null) {
+            throw new IllegalArgumentException("Savings account not found");
+        }
+        SavingsAccount locked = savingsAccountDao.findByAccountNumberForUpdate(account.getAccountNumber());
+        if (locked != null) {
+            return locked;
+        }
+        if (account.getId() == null) {
+            return account;
+        }
+        throw new IllegalArgumentException("Savings account not found");
     }
 
 }
