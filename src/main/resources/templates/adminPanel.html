@@ -44,7 +44,7 @@
                 </td>
                 <td data-th-text="${userList.phone}">...</td>
                 <td data-th-text="${userList.email}">...</td>
-                <td data-th-text="${userList.aadhaarId}">...</td>
+                <td data-th-text="${userList.maskedAadhaarId}">...</td>
                 <td>
 				    <button th:if="${userList.enabled}" type="button" class="btn btn-success" th:datausername=${userList.username} th:onclick="|changeStatus(this.getAttribute('datausername'))|">Enabled</button>
 				    <button th:unless="${userList.enabled}" type="button" class="btn btn-danger" th:datausername=${userList.username} th:onclick="|changeStatus(this.getAttribute('datausername'))|">Disabled</button>

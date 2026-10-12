@@ -58,6 +58,9 @@ public class UserServiceImpl implements UserService {
 
     public User createUser(User user, Set<UserRole> userRoles) {
     	
+        if (user == null) {
+            throw new IllegalArgumentException("Registration is required");
+        }
         User localUser = userDao.findByUsername(user.getUsername());
 
         if (localUser != null) {
@@ -65,6 +68,7 @@ public class UserServiceImpl implements UserService {
             logger.info("User with username {} already exist. Nothing will be done. ", user.getUsername());
             
         } else {
+            validateRegistration(user);
         	
             String encryptedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encryptedPassword);
@@ -86,6 +90,19 @@ public class UserServiceImpl implements UserService {
 
         return localUser;
         
+    }
+
+    private void validateRegistration(User user) {
+        if (user == null || isBlank(user.getUsername()) || isBlank(user.getPassword())
+                || user.getPassword().length() < 12 || isBlank(user.getFirstName())
+                || isBlank(user.getLastName()) || isBlank(user.getAadhaarId())
+                || isBlank(user.getEmail()) || isBlank(user.getPhone())) {
+            throw new IllegalArgumentException("All registration fields are required and the password must be at least 12 characters");
+        }
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 
     public boolean checkUserExists(String username, String email) {

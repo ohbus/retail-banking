@@ -1,8 +1,5 @@
 package xyz.subho.retail.banking.service;
 
-import java.security.Principal;
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -28,7 +25,7 @@ public interface TransactionService {
 
     void betweenAccountsTransfer(String transferFrom, String transferTo, String amount, CurrentAccount currentAccount, SavingsAccount savingsAccount);
 
-    List<Recipient> findRecipientList(Principal principal);
+    Page<Recipient> findRecipientPage(String username, Pageable pageable);
 
     Recipient saveRecipient(Recipient recipient, String username);
 

@@ -19,10 +19,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import xyz.subho.retail.banking.service.AccountService;
 import xyz.subho.retail.banking.service.TransactionService;
 import xyz.subho.retail.banking.service.UserService;
+import xyz.subho.retail.banking.model.User;
 
 @ExtendWith(MockitoExtension.class)
 class AccountControllerTest {
@@ -92,5 +95,18 @@ class AccountControllerTest {
 
         assertEquals("deposit", result);
         assertEquals("The account changed while processing. Please try again.", model.getAttribute("error"));
+    }
+
+    @Test
+    void transactionPageIsCapped() {
+        User user = new User();
+        user.setCurrentAccount(new xyz.subho.retail.banking.model.CurrentAccount());
+        when(userService.findByUsername("alice")).thenReturn(user);
+        when(transactionService.findCurrentTransactionPage("alice", PageRequest.of(1_000, 50)))
+                .thenReturn(Page.empty());
+
+        controller.currentAccount(new ExtendedModelMap(), principal, Integer.MAX_VALUE);
+
+        verify(transactionService).findCurrentTransactionPage("alice", PageRequest.of(1_000, 50));
     }
 }

@@ -72,14 +72,14 @@ class UserServiceImplTest {
     void createUserNewUser() {
         User user = new User();
         user.setUsername("newuser");
-        user.setPassword("password");
+        setRegistrationFields(user);
         Role role = new Role();
         role.setRoleId(1);
         UserRole userRole = new UserRole(user, role);
         Set<UserRole> userRoles = new HashSet<>(Collections.singletonList(userRole));
 
         when(userDao.findByUsername("newuser")).thenReturn(null);
-        when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
+        when(passwordEncoder.encode("password-password")).thenReturn("encodedPassword");
         when(userDao.save(any(User.class))).thenReturn(user);
 
         User createdUser = userService.createUser(user, userRoles);
@@ -105,14 +105,24 @@ class UserServiceImplTest {
     }
 
     @Test
+    void createUserRejectsIncompleteRegistration() {
+        User user = new User();
+        user.setUsername("newuser");
+        when(userDao.findByUsername("newuser")).thenReturn(null);
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(user, new HashSet<>()));
+        verify(userDao, never()).save(any(User.class));
+    }
+
+    @Test
     void usesReservedNumbersForBothAccounts() {
         User user = new User();
         user.setUsername("newuser");
-        user.setPassword("password");
+        setRegistrationFields(user);
         Role role = new Role();
         UserRole userRole = new UserRole(user, role);
         when(userDao.findByUsername("newuser")).thenReturn(null);
-        when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
+        when(passwordEncoder.encode("password-password")).thenReturn("encodedPassword");
         when(accountNumberService.next()).thenReturn(12345, 54321);
         when(userDao.save(any(User.class))).thenReturn(user);
 
@@ -196,5 +206,14 @@ class UserServiceImplTest {
         userService.disableUser("testuser");
         assertFalse(user.isEnabled());
         verify(userDao, times(1)).save(user);
+    }
+
+    private void setRegistrationFields(User user) {
+        user.setPassword("password-password");
+        user.setFirstName("Test");
+        user.setLastName("User");
+        user.setAadhaarId("1234 5678 9012");
+        user.setEmail("test@example.com");
+        user.setPhone("1234567890");
     }
 }

@@ -35,6 +35,8 @@ import xyz.subho.retail.banking.service.UserService;
 public class AdminController {
 
 	private static final int TRANSACTIONS_PER_PAGE = 50;
+	// shortcut: page 1,000 (50,000 rows); use cursor pagination before deeper history is required.
+	private static final int MAX_PAGE = 1_000;
 
 	private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
@@ -60,7 +62,7 @@ public class AdminController {
 	@GetMapping("/panel")
 	@PreAuthorize("hasRole('ADMIN')")
 	public String profile(Model model, @RequestParam(defaultValue = "0") int page) {
-		Page<User> userPage = userService.findUserPage(PageRequest.of(Math.max(page, 0), TRANSACTIONS_PER_PAGE));
+		Page<User> userPage = userService.findUserPage(PageRequest.of(normalizePage(page), TRANSACTIONS_PER_PAGE));
 		model.addAttribute("userList", userPage.getContent());
 		model.addAttribute("userPage", userPage);
 
@@ -102,7 +104,7 @@ public class AdminController {
 	public String currentAccount(@ModelAttribute("username") String uname, Model model,
 			@RequestParam(defaultValue = "0") int page) {
 		Page<CurrentTransaction> currentTransactionPage = transactionService
-				.findCurrentTransactionPage(uname, PageRequest.of(Math.max(page, 0), TRANSACTIONS_PER_PAGE));
+				.findCurrentTransactionPage(uname, PageRequest.of(normalizePage(page), TRANSACTIONS_PER_PAGE));
 
 		User user = userService.findByUsername(uname);
 		CurrentAccount currentAccount = user.getCurrentAccount();
@@ -122,7 +124,7 @@ public class AdminController {
 	public String savingsAccount(@ModelAttribute("username") String uname, Model model,
 			@RequestParam(defaultValue = "0") int page) {
 		Page<SavingsTransaction> savingsTransactionPage = transactionService
-				.findSavingsTransactionPage(uname, PageRequest.of(Math.max(page, 0), TRANSACTIONS_PER_PAGE));
+				.findSavingsTransactionPage(uname, PageRequest.of(normalizePage(page), TRANSACTIONS_PER_PAGE));
 		User user = userService.findByUsername(uname);
 		SavingsAccount savingsAccount = user.getSavingsAccount();
 
@@ -182,6 +184,10 @@ public class AdminController {
             
         }
         
+    }
+
+    private int normalizePage(int page) {
+        return Math.min(Math.max(page, 0), MAX_PAGE);
     }
 
 }

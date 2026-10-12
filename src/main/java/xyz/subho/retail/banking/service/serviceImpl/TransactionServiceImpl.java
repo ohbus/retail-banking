@@ -1,9 +1,7 @@
 package xyz.subho.retail.banking.service.serviceImpl;
 
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -119,9 +117,8 @@ public class TransactionServiceImpl implements TransactionService {
         
     }
 
-    public List<Recipient> findRecipientList(Principal principal) {
-    	
-        return recipientDao.findByUserUsername(principal.getName());
+    public Page<Recipient> findRecipientPage(String username, Pageable pageable) {
+        return recipientDao.findByUserUsername(username, pageable);
         
     }
 

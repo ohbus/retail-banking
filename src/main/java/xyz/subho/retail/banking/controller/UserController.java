@@ -38,6 +38,12 @@ public class UserController {
     public String profilePost(@ModelAttribute("user") User newUser, Model model, Principal principal) {
     	
         User user = userService.findByUsername(principal.getName());
+        if (hasBlankProfileField(newUser)) {
+            model.addAttribute("user", user);
+            model.addAttribute("validationError", "All profile fields are required");
+            return "profile";
+        }
+
         String existingEmail = user.getEmail();
         user.setFirstName(newUser.getFirstName());
         user.setLastName(newUser.getLastName());
@@ -56,6 +62,14 @@ public class UserController {
 
         return "profile";
         
+    }
+
+    private boolean hasBlankProfileField(User user) {
+        return user == null || user.getFirstName() == null || user.getFirstName().isBlank()
+                || user.getLastName() == null || user.getLastName().isBlank()
+                || user.getAadhaarId() == null || user.getAadhaarId().isBlank()
+                || user.getEmail() == null || user.getEmail().isBlank()
+                || user.getPhone() == null || user.getPhone().isBlank();
     }
 
 }

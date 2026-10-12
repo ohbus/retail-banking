@@ -26,6 +26,8 @@ import xyz.subho.retail.banking.service.UserService;
 public class AccountController {
 
     private static final int TRANSACTIONS_PER_PAGE = 50;
+    // shortcut: page 1,000 (50,000 rows); use cursor pagination before deeper history is required.
+    private static final int MAX_PAGE = 1_000;
 
     private final UserService userService;
     private final AccountService accountService;
@@ -144,7 +146,7 @@ public class AccountController {
     }
 
     private int normalizePage(int page) {
-        return Math.max(page, 0);
+        return Math.min(Math.max(page, 0), MAX_PAGE);
     }
     
 }

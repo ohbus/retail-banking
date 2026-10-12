@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import xyz.subho.retail.banking.model.Recipient;
 import xyz.subho.retail.banking.model.User;
@@ -39,7 +41,8 @@ class TransferControllerTest {
         Principal principal = () -> "alice";
         Recipient recipient = new Recipient();
         when(transactionService.findRecipientById(1L, "alice")).thenReturn(recipient);
-        when(transactionService.findRecipientList(principal)).thenReturn(List.of(recipient));
+        when(transactionService.findRecipientPage("alice", PageRequest.of(0, 50)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(recipient)));
 
         assertEquals("recipient", controller.recipientEdit(1L, new ExtendedModelMap(), principal));
         verify(transactionService).findRecipientById(1L, "alice");
@@ -48,10 +51,22 @@ class TransferControllerTest {
     @Test
     void recipientDeleteIsOwnerScoped() {
         Principal principal = () -> "alice";
-        when(transactionService.findRecipientList(principal)).thenReturn(List.of());
+        when(transactionService.findRecipientPage("alice", PageRequest.of(0, 50)))
+                .thenReturn(Page.empty());
 
         assertEquals("recipient", controller.recipientDelete(1L, new ExtendedModelMap(), principal));
         verify(transactionService).deleteRecipientById(1L, "alice");
+    }
+
+    @Test
+    void recipientPageIsCapped() {
+        Principal principal = () -> "alice";
+        when(transactionService.findRecipientPage("alice", PageRequest.of(1_000, 50)))
+                .thenReturn(Page.empty());
+
+        assertEquals("recipient", controller.recipient(new ExtendedModelMap(), principal, Integer.MAX_VALUE));
+
+        verify(transactionService).findRecipientPage("alice", PageRequest.of(1_000, 50));
     }
 
     @Test
@@ -86,6 +101,8 @@ class TransferControllerTest {
         User user = new User();
         when(userService.findByUsername("alice")).thenReturn(user);
         when(transactionService.findRecipientById(1L, "alice")).thenReturn(new Recipient());
+        when(transactionService.findRecipientPage("alice", PageRequest.of(0, 50)))
+                .thenReturn(Page.empty());
         doThrow(new IllegalArgumentException("Amount is invalid")).when(transactionService)
                 .toSomeoneElseTransfer(org.mockito.ArgumentMatchers.any(Recipient.class),
                         org.mockito.ArgumentMatchers.eq("Current"), org.mockito.ArgumentMatchers.eq("bad"),

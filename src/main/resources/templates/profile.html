@@ -36,7 +36,8 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="aadhaarId" class="cols-sm-2 control-label">Aadhaar Id</label>
+                    <label for="aadhaarId" class="cols-sm-2 control-label">Aadhaar Id</label><span
+                        class="bg-danger pull-right" th:if="${validationError}" th:text="${validationError}"></span>
                     <div class="cols-sm-10">
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>

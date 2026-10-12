@@ -81,6 +81,13 @@
             </table>
         </div>
     </div>
+    <nav th:if="${recipientPage.totalPages > 1}" aria-label="Recipient pages">
+        <a th:if="${recipientPage.hasPrevious()}"
+           th:href="@{/transfer/recipient(page=${recipientPage.number - 1})}">Previous</a>
+        <span>Page [[${recipientPage.number + 1}]] of [[${recipientPage.totalPages}]]</span>
+        <a th:if="${recipientPage.hasNext()}"
+           th:href="@{/transfer/recipient(page=${recipientPage.number + 1})}">Next</a>
+    </nav>
 </div>
 
 

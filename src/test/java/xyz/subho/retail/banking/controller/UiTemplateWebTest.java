@@ -95,6 +95,7 @@ class UiTemplateWebTest {
         user.setFirstName("Alice");
         user.setLastName("Tester");
         user.setEmail("alice@example.com");
+        user.setAadhaarId("1234 5678 9012");
         user.setCurrentAccount(currentAccount);
         user.setSavingsAccount(savingsAccount);
 
@@ -104,7 +105,8 @@ class UiTemplateWebTest {
         when(transactionService.findSavingsTransactionPage(eq("alice"), org.mockito.ArgumentMatchers.any(Pageable.class)))
                 .thenReturn(Page.empty());
         when(userService.findUserPage(org.mockito.ArgumentMatchers.any(Pageable.class))).thenReturn(Page.empty());
-        when(transactionService.findRecipientList(any())).thenReturn(List.of(recipient()));
+        when(transactionService.findRecipientPage(eq("alice"), org.mockito.ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(recipient())));
     }
 
     @Test
@@ -257,6 +259,8 @@ class UiTemplateWebTest {
                 .andExpect(content().string(containsString("Account Management Portal")))
                 .andExpect(content().string(containsString("alice")))
                 .andExpect(content().string(containsString("bob")))
+                .andExpect(content().string(containsString("****9012")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(containsString("1234 5678 9012"))))
                 .andExpect(content().string(containsString("Enabled")))
                 .andExpect(content().string(containsString("Disabled")))
                 .andExpect(content().string(containsString("addCsrfField")))

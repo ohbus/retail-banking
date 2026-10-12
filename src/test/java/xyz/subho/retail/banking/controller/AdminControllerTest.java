@@ -17,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.ExtendedModelMap;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import xyz.subho.retail.banking.dao.RoleDao;
 import xyz.subho.retail.banking.model.User;
@@ -129,5 +131,14 @@ class AdminControllerTest {
 
         assertEquals("redirect:/admin/panel", controller.profileActivator("bob", new ExtendedModelMap()));
         assertTrue(user.isEnabled());
+    }
+
+    @Test
+    void adminUserPageIsCapped() {
+        when(userService.findUserPage(PageRequest.of(1_000, 50))).thenReturn(Page.empty());
+
+        controller.profile(new ExtendedModelMap(), Integer.MAX_VALUE);
+
+        verify(userService).findUserPage(PageRequest.of(1_000, 50));
     }
 }

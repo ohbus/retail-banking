@@ -179,10 +179,7 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void findRecipientList() {
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn("testuser");
-
+    void findRecipientPage() {
         User user = new User();
         user.setUsername("testuser");
 
@@ -200,15 +197,17 @@ class TransactionServiceImplTest {
         allRecipients.add(recipient2);
         allRecipients.add(recipient3);
 
-        when(recipientDao.findByUserUsername("testuser")).thenReturn(List.of(recipient1, recipient2));
+        PageRequest pageRequest = PageRequest.of(0, 50);
+        when(recipientDao.findByUserUsername("testuser", pageRequest))
+                .thenReturn(new PageImpl<>(List.of(recipient1, recipient2)));
 
-        List<Recipient> result = transactionService.findRecipientList(principal);
+        Page<Recipient> result = transactionService.findRecipientPage("testuser", pageRequest);
 
         assertNotNull(result);
-        assertEquals(2, result.size());
-        assertTrue(result.contains(recipient1));
-        assertTrue(result.contains(recipient2));
-        assertFalse(result.contains(recipient3));
+        assertEquals(2, result.getContent().size());
+        assertTrue(result.getContent().contains(recipient1));
+        assertTrue(result.getContent().contains(recipient2));
+        assertFalse(result.getContent().contains(recipient3));
     }
 
     @Test

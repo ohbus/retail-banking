@@ -1,8 +1,9 @@
 package xyz.subho.retail.banking.controller;
 
 import java.security.Principal;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.ui.Model;
@@ -21,6 +22,10 @@ import xyz.subho.retail.banking.service.UserService;
 @Controller
 @RequestMapping("/transfer")
 public class TransferController {
+
+    private static final int RECIPIENTS_PER_PAGE = 50;
+    // shortcut: page 1,000 (50,000 recipients); use cursor pagination before deeper lists are required.
+    private static final int MAX_PAGE = 1_000;
 
     private final TransactionService transactionService;
     private final UserService userService;
@@ -73,13 +78,14 @@ public class TransferController {
     }
 
     @RequestMapping(value = "/recipient", method = RequestMethod.GET)
-    public String recipient(Model model, Principal principal) {
-    	
-        List<Recipient> recipientList = transactionService.findRecipientList(principal);
+    public String recipient(Model model, Principal principal,
+                            @RequestParam(defaultValue = "0") int page) {
+        Page<Recipient> recipientPage = findRecipientPage(principal.getName(), page);
 
         Recipient recipient = new Recipient();
 
-        model.addAttribute("recipientList", recipientList);
+        model.addAttribute("recipientList", recipientPage.getContent());
+        model.addAttribute("recipientPage", recipientPage);
         model.addAttribute("recipient", recipient);
 
         return "recipient";
@@ -101,9 +107,10 @@ public class TransferController {
     public String recipientEdit(@RequestParam(value = "recipientId") Long recipientId, Model model, Principal principal) {
 
         Recipient recipient = transactionService.findRecipientById(recipientId, principal.getName());
-        List<Recipient> recipientList = transactionService.findRecipientList(principal);
+        Page<Recipient> recipientPage = findRecipientPage(principal.getName(), 0);
 
-        model.addAttribute("recipientList", recipientList);
+        model.addAttribute("recipientList", recipientPage.getContent());
+        model.addAttribute("recipientPage", recipientPage);
         model.addAttribute("recipient", recipient);
 
         return "recipient";
@@ -115,11 +122,12 @@ public class TransferController {
 
         transactionService.deleteRecipientById(recipientId, principal.getName());
 
-        List<Recipient> recipientList = transactionService.findRecipientList(principal);
+        Page<Recipient> recipientPage = findRecipientPage(principal.getName(), 0);
 
         Recipient recipient = new Recipient();
         model.addAttribute("recipient", recipient);
-        model.addAttribute("recipientList", recipientList);
+        model.addAttribute("recipientList", recipientPage.getContent());
+        model.addAttribute("recipientPage", recipientPage);
 
         return "recipient";
         
@@ -127,8 +135,9 @@ public class TransferController {
 
     @RequestMapping(value = "/toSomeoneElse", method = RequestMethod.GET)
     public String toSomeoneElse(Model model, Principal principal) {
-        List<Recipient> recipientList = transactionService.findRecipientList(principal);
-        model.addAttribute("recipientList", recipientList);
+        Page<Recipient> recipientPage = findRecipientPage(principal.getName(), 0);
+        model.addAttribute("recipientList", recipientPage.getContent());
+        model.addAttribute("recipientPage", recipientPage);
         model.addAttribute("accountType", "");
         return "toSomeoneElse";
     }
@@ -145,20 +154,29 @@ public class TransferController {
                     user.getCurrentAccount(), user.getSavingsAccount());
         } catch (IllegalArgumentException exception) {
             model.addAttribute("error", exception.getMessage());
-            model.addAttribute("recipientList", transactionService.findRecipientList(principal));
+            Page<Recipient> recipientPage = findRecipientPage(principal.getName(), 0);
+            model.addAttribute("recipientList", recipientPage.getContent());
+            model.addAttribute("recipientPage", recipientPage);
             model.addAttribute("recipientId", recipientId);
             model.addAttribute("accountType", accountType);
             model.addAttribute("amount", amount);
             return "toSomeoneElse";
         } catch (OptimisticLockingFailureException exception) {
             model.addAttribute("error", "The account changed while processing. Please try again.");
-            model.addAttribute("recipientList", transactionService.findRecipientList(principal));
+            Page<Recipient> recipientPage = findRecipientPage(principal.getName(), 0);
+            model.addAttribute("recipientList", recipientPage.getContent());
+            model.addAttribute("recipientPage", recipientPage);
             model.addAttribute("recipientId", recipientId);
             model.addAttribute("accountType", accountType);
             model.addAttribute("amount", amount);
             return "toSomeoneElse";
         }
         return "redirect:/userFront";
+    }
+
+    private Page<Recipient> findRecipientPage(String username, int page) {
+        int safePage = Math.min(Math.max(page, 0), MAX_PAGE);
+        return transactionService.findRecipientPage(username, PageRequest.of(safePage, RECIPIENTS_PER_PAGE));
     }
     
 }

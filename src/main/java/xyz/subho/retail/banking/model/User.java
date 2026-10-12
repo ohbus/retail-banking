@@ -19,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -192,6 +193,14 @@ public class User implements UserDetails {
 
 	public void setAadhaarId(String aadhaarId) {
 		this.aadhaarId = aadhaarId;
+	}
+
+	@Transient
+	public String getMaskedAadhaarId() {
+		if (aadhaarId == null || aadhaarId.length() < 4) {
+			return "****";
+		}
+		return "****" + aadhaarId.substring(aadhaarId.length() - 4);
 	}
 
 }

@@ -33,6 +33,10 @@ class UserControllerTest {
         User submitted = new User();
         submitted.setUsername("victim");
         submitted.setFirstName("Updated");
+        submitted.setLastName("User");
+        submitted.setAadhaarId("1234 5678 9012");
+        submitted.setEmail("alice@example.com");
+        submitted.setPhone("1234567890");
         Principal principal = () -> "alice";
         when(userService.findByUsername("alice")).thenReturn(authenticated);
 
@@ -51,7 +55,11 @@ class UserControllerTest {
         authenticated.setUsername("alice");
         authenticated.setEmail("alice@example.com");
         User submitted = new User();
+        submitted.setFirstName("Alice");
+        submitted.setLastName("User");
+        submitted.setAadhaarId("1234 5678 9012");
         submitted.setEmail("taken@example.com");
+        submitted.setPhone("1234567890");
         Principal principal = () -> "alice";
         ExtendedModelMap model = new ExtendedModelMap();
         when(userService.findByUsername("alice")).thenReturn(authenticated);
@@ -61,5 +69,17 @@ class UserControllerTest {
         assertEquals("profile", controller.profilePost(submitted, model, principal));
         assertEquals("alice@example.com", authenticated.getEmail());
         assertEquals(true, model.getAttribute("emailExists"));
+    }
+
+    @Test
+    void blankProfileFieldsAreRejectedBeforeSave() {
+        User authenticated = new User();
+        authenticated.setUsername("alice");
+        User submitted = new User();
+        Principal principal = () -> "alice";
+        when(userService.findByUsername("alice")).thenReturn(authenticated);
+
+        assertEquals("profile", controller.profilePost(submitted, new ExtendedModelMap(), principal));
+        verify(userService, org.mockito.Mockito.never()).saveUser(authenticated);
     }
 }
