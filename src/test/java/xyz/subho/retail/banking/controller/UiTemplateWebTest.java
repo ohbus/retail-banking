@@ -31,7 +31,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import xyz.subho.retail.banking.config.RequestFilter;
 import xyz.subho.retail.banking.config.SecurityConfig;
 import xyz.subho.retail.banking.dao.RoleDao;
 import xyz.subho.retail.banking.model.CurrentAccount;
@@ -53,7 +52,7 @@ import xyz.subho.retail.banking.service.serviceImpl.UserSecurityServiceImpl;
         TransferController.class,
         UserController.class
 })
-@Import({SecurityConfig.class, RequestFilter.class})
+@Import(SecurityConfig.class)
 @TestPropertySource(properties = "security.remember-me-key=test-only-remember-me-key")
 class UiTemplateWebTest {
 

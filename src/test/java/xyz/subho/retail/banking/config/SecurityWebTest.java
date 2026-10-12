@@ -21,7 +21,7 @@ import xyz.subho.retail.banking.service.UserService;
 import xyz.subho.retail.banking.service.serviceImpl.UserSecurityServiceImpl;
 
 @WebMvcTest(AccountController.class)
-@Import({SecurityConfig.class, RequestFilter.class})
+@Import(SecurityConfig.class)
 @TestPropertySource(properties = "security.remember-me-key=test-only-remember-me-key")
 class SecurityWebTest {
 
