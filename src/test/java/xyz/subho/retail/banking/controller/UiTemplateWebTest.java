@@ -195,7 +195,7 @@ class UiTemplateWebTest {
                 .andExpect(view().name("betweenAccounts"))
                 .andExpect(content().string(containsString("/transfer/betweenAccounts")))
                 .andExpect(content().string(containsString("_csrf")))
-                .andExpect(content().string(containsString("value=\"Current\">Primary")));
+                .andExpect(content().string(containsString("value=\"Current\">Current")));
 
         mockMvc.perform(get("/transfer/toSomeoneElse").with(user("alice").roles("USER")))
                 .andExpect(status().isOk())

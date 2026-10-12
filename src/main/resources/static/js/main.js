@@ -19,18 +19,18 @@
 
     $.transferDisplay = function () {
         $("#transferFrom").change(function () {
-            if ($("#transferFrom").val() == 'Primary') {
+            if ($("#transferFrom").val() == 'Current') {
                 $('#transferTo').val('Savings');
             } else if ($("#transferFrom").val() == 'Savings') {
-                $('#transferTo').val('Primary');
+                $('#transferTo').val('Current');
             }
         });
 
         $("#transferTo").change(function () {
-            if ($("#transferTo").val() == 'Primary') {
+            if ($("#transferTo").val() == 'Current') {
                 $('#transferFrom').val('Savings');
             } else if ($("#transferTo").val() == 'Savings') {
-                $('#transferFrom').val('Primary');
+                $('#transferFrom').val('Current');
             }
         });
     };
