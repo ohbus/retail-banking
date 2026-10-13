@@ -23,6 +23,8 @@ import xyz.subho.retail.banking.service.AccountNumberService;
 @Transactional
 public class UserServiceImpl implements UserService {
 
+    private static final int MAX_TEXT_LENGTH = 255;
+    private static final int MAX_PASSWORD_LENGTH = 72;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserDao userDao;
@@ -61,6 +63,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new IllegalArgumentException("Registration is required");
         }
+        validateRegistration(user);
         User localUser = userDao.findByUsername(user.getUsername());
 
         if (localUser != null) {
@@ -68,8 +71,7 @@ public class UserServiceImpl implements UserService {
             logger.info("User with username {} already exist. Nothing will be done. ", user.getUsername());
             
         } else {
-            validateRegistration(user);
-        	
+
             String encryptedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encryptedPassword);
 
@@ -94,15 +96,22 @@ public class UserServiceImpl implements UserService {
 
     private void validateRegistration(User user) {
         if (user == null || isBlank(user.getUsername()) || isBlank(user.getPassword())
-                || user.getPassword().length() < 12 || isBlank(user.getFirstName())
-                || isBlank(user.getLastName()) || isBlank(user.getAadhaarId())
-                || isBlank(user.getEmail()) || isBlank(user.getPhone())) {
+                || user.getPassword().length() < 12 || user.getPassword().length() > MAX_PASSWORD_LENGTH
+                || isBlank(user.getFirstName()) || isBlank(user.getLastName())
+                || isBlank(user.getAadhaarId()) || isBlank(user.getEmail()) || isBlank(user.getPhone())
+                || exceedsTextLength(user.getUsername()) || exceedsTextLength(user.getFirstName())
+                || exceedsTextLength(user.getLastName()) || exceedsTextLength(user.getAadhaarId())
+                || exceedsTextLength(user.getEmail()) || exceedsTextLength(user.getPhone())) {
             throw new IllegalArgumentException("All registration fields are required and the password must be at least 12 characters");
         }
     }
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private boolean exceedsTextLength(String value) {
+        return value != null && value.length() > MAX_TEXT_LENGTH;
     }
 
     public boolean checkUserExists(String username, String email) {

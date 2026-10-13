@@ -69,7 +69,14 @@ public class UserController {
                 || user.getLastName() == null || user.getLastName().isBlank()
                 || user.getAadhaarId() == null || user.getAadhaarId().isBlank()
                 || user.getEmail() == null || user.getEmail().isBlank()
-                || user.getPhone() == null || user.getPhone().isBlank();
+                || user.getPhone() == null || user.getPhone().isBlank()
+                || exceedsTextLength(user.getFirstName()) || exceedsTextLength(user.getLastName())
+                || exceedsTextLength(user.getAadhaarId()) || exceedsTextLength(user.getEmail())
+                || exceedsTextLength(user.getPhone());
+    }
+
+    private boolean exceedsTextLength(String value) {
+        return value != null && value.length() > 255;
     }
 
 }

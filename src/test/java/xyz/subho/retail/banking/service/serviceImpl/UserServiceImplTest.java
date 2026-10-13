@@ -96,6 +96,7 @@ class UserServiceImplTest {
     void createUserExistingUser() {
         User user = new User();
         user.setUsername("existinguser");
+        setRegistrationFields(user);
         when(userDao.findByUsername("existinguser")).thenReturn(user);
 
         User createdUser = userService.createUser(user, new HashSet<>());
