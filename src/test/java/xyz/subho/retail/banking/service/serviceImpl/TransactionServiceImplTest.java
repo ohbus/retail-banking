@@ -198,7 +198,7 @@ class TransactionServiceImplTest {
         allRecipients.add(recipient3);
 
         PageRequest pageRequest = PageRequest.of(0, 50);
-        when(recipientDao.findByUserUsername("testuser", pageRequest))
+        when(recipientDao.findByUserUsernameOrderByIdAsc("testuser", pageRequest))
                 .thenReturn(new PageImpl<>(List.of(recipient1, recipient2)));
 
         Page<Recipient> result = transactionService.findRecipientPage("testuser", pageRequest);

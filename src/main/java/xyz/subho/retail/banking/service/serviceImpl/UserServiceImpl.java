@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public Page<User> findUserPage(Pageable pageable) {
-        return userDao.findAll(pageable);
+        return userDao.findAllByOrderByUserIdAsc(pageable);
         
     }
 

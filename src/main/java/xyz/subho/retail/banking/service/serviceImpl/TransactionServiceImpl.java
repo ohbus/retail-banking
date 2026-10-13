@@ -121,7 +121,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public Page<Recipient> findRecipientPage(String username, Pageable pageable) {
-        return recipientDao.findByUserUsername(username, pageable);
+        return recipientDao.findByUserUsernameOrderByIdAsc(username, pageable);
         
     }
 

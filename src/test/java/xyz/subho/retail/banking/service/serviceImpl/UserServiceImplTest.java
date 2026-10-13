@@ -207,11 +207,11 @@ class UserServiceImplTest {
     @Test
     void findsUsersAsAPage() {
         List<User> users = Collections.singletonList(new User());
-        when(userDao.findAll(PageRequest.of(0, 10))).thenReturn(new PageImpl<>(users));
+        when(userDao.findAllByOrderByUserIdAsc(PageRequest.of(0, 10))).thenReturn(new PageImpl<>(users));
         Page<User> foundUsers = userService.findUserPage(PageRequest.of(0, 10));
         assertNotNull(foundUsers);
         assertEquals(1, foundUsers.getContent().size());
-        verify(userDao, times(1)).findAll(PageRequest.of(0, 10));
+        verify(userDao, times(1)).findAllByOrderByUserIdAsc(PageRequest.of(0, 10));
     }
 
     @Test

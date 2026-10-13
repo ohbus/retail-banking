@@ -8,7 +8,7 @@ import xyz.subho.retail.banking.model.Recipient;
 
 public interface RecipientDao extends CrudRepository<Recipient, Long> {
 
-    Page<Recipient> findByUserUsername(String username, Pageable pageable);
+    Page<Recipient> findByUserUsernameOrderByIdAsc(String username, Pageable pageable);
 
     Recipient findByIdAndUserUsername(Long recipientId, String username);
 
