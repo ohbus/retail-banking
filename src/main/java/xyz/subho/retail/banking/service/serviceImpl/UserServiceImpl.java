@@ -120,7 +120,9 @@ public class UserServiceImpl implements UserService {
     }
 
     public boolean checkUserExists(String username, String email) {
-    	
+        if (isBlank(username) || isBlank(email) || exceedsTextLength(username) || exceedsTextLength(email)) {
+            return false;
+        }
         return checkUsernameExists(username) || checkEmailExists(email);
         
     }

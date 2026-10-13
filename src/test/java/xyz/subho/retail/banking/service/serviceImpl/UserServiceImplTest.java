@@ -183,6 +183,12 @@ class UserServiceImplTest {
     }
 
     @Test
+    void checkUserExistsDoesNotQueryForInvalidIdentifiers() {
+        assertFalse(userService.checkUserExists("x".repeat(256), "valid@example.com"));
+        verifyNoInteractions(userDao);
+    }
+
+    @Test
     void saveUser() {
         User user = new User();
         when(userDao.save(user)).thenReturn(user);
