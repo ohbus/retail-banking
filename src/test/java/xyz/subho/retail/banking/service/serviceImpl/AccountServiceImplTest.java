@@ -259,6 +259,15 @@ class AccountServiceImplTest {
     }
 
     @Test
+    void rejectsAmountBeyondDatabasePrecision() {
+        Principal principal = mock(Principal.class);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> accountService.deposit("Current", new BigDecimal("100000000000000000.00"), principal));
+        verifyNoInteractions(userService, currentAccountDao, transactionService);
+    }
+
+    @Test
     void rejectsNullAmountAndNullBalance() {
         Principal principal = mock(Principal.class);
         assertThrows(IllegalArgumentException.class,

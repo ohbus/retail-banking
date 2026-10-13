@@ -13,34 +13,36 @@
                 <div class="form-group">
                     <label for="recipientName">Name</label>
                     <input type="text" class="form-control" th:value="${recipient.name}" name="name"
-                           id="recipientName" placeholder="Name"/>
+                           id="recipientName" placeholder="Name" maxlength="255" required="required"/>
                 </div>
                 <div class="form-group">
                     <label for="recipientEmail">Email</label>
                     <input type="email" class="form-control" th:value="${recipient.email}" name="email"
-                           id="recipientEmail" placeholder="Email"/>
+                           id="recipientEmail" placeholder="Email" maxlength="255" required="required"/>
                 </div>
                 <div class="form-group">
                     <label for="recipientPhone">Phone</label>
                     <input type="text" class="form-control" th:value="${recipient.phone}" name="phone"
-                           id="recipientPhone" placeholder="Phone"/>
+                           id="recipientPhone" placeholder="Phone" maxlength="255" required="required"/>
                 </div>
                 <div class="form-group">
                     <label for="recipientAccountNumber">Account Number</label>
                     <input type="text" class="form-control" th:value="${recipient.accountNumber}"
-                           name="accountNumber" id="recipientAccountNumber" placeholder="Account Number"/>
+                           name="accountNumber" id="recipientAccountNumber" placeholder="Account Number"
+                           maxlength="9" required="required"/>
                 </div>
                 <div class="form-group">
                     <label for="recipientDescription">Description</label>
                     <textarea class="form-control" th:value="${recipient.description}" name="description"
                               id="recipientDescription" placeholder="Description"
-                              th:text="${recipient.description}"></textarea>
+                              maxlength="255" th:text="${recipient.description}"></textarea>
                 </div>
 
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
                 <button class="btn btn-primary" type="submit">Add/Edit Recipient</button>
             </form>
+            <p class="text-danger" th:if="${error}" th:text="${error}"></p>
 
             <div class="col-md-6">
             </div>

@@ -26,6 +26,8 @@ import xyz.subho.retail.banking.service.UserService;
 @Transactional
 public class TransactionServiceImpl implements TransactionService {
 
+    private static final int MAX_INTEGER_DIGITS = 17;
+
     private final UserService userService;
     private final CurrentTransactionDao currentTransactionDao;
     private final SavingsTransactionDao savingsTransactionDao;
@@ -123,6 +125,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public Recipient saveRecipient(Recipient recipient, String username) {
+        validateRecipient(recipient, username);
         if (recipient.getId() != null) {
             Recipient existing = recipientDao.findById(recipient.getId())
                     .orElseThrow(() -> new IllegalArgumentException("Recipient not found"));
@@ -136,9 +139,39 @@ public class TransactionServiceImpl implements TransactionService {
             existing.setDescription(recipient.getDescription());
             return recipientDao.save(existing);
         }
-        recipient.setUser(userService.findByUsername(username));
+        User owner = userService.findByUsername(username);
+        if (owner == null) {
+            throw new IllegalArgumentException("Recipient owner not found");
+        }
+        recipient.setUser(owner);
         return recipientDao.save(recipient);
         
+    }
+
+    private void validateRecipient(Recipient recipient, String username) {
+        if (recipient == null || username == null || username.isBlank()
+                || isBlank(recipient.getName()) || isBlank(recipient.getEmail())
+                || isBlank(recipient.getPhone()) || isBlank(recipient.getAccountNumber())
+                || exceedsColumnLength(recipient.getName()) || exceedsColumnLength(recipient.getEmail())
+                || exceedsColumnLength(recipient.getPhone()) || exceedsColumnLength(recipient.getAccountNumber())
+                || exceedsColumnLength(recipient.getDescription())) {
+            throw new IllegalArgumentException("Recipient fields are invalid");
+        }
+        try {
+            if (Integer.parseInt(recipient.getAccountNumber()) <= 0) {
+                throw new IllegalArgumentException("Recipient account is invalid");
+            }
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("Recipient account is invalid", exception);
+        }
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    private boolean exceedsColumnLength(String value) {
+        return value != null && value.length() > 255;
     }
 
     public Recipient findRecipientById(Long recipientId, String username) {
@@ -238,7 +271,8 @@ public class TransactionServiceImpl implements TransactionService {
         }
         try {
             BigDecimal value = new BigDecimal(amount);
-            if (value.signum() <= 0 || value.scale() > 2) {
+            if (value.signum() <= 0 || value.scale() > 2
+                    || value.setScale(2).precision() - 2 > MAX_INTEGER_DIGITS) {
                 throw new IllegalArgumentException("Amount must be positive with at most two decimal places");
             }
             return value.setScale(2);

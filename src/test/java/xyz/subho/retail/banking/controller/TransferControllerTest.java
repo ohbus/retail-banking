@@ -77,8 +77,20 @@ class TransferControllerTest {
         Recipient recipient = new Recipient();
         when(userService.findByUsername("alice")).thenReturn(user);
 
-        assertEquals("redirect:/transfer/recipient", controller.recipientPost(recipient, principal));
+        assertEquals("redirect:/transfer/recipient", controller.recipientPost(recipient, principal, new ExtendedModelMap()));
         verify(transactionService).saveRecipient(recipient, "alice");
+    }
+
+    @Test
+    void invalidRecipientSaveReturnsForm() {
+        Principal principal = () -> "alice";
+        when(transactionService.findRecipientPage("alice", PageRequest.of(0, 50))).thenReturn(Page.empty());
+        doThrow(new IllegalArgumentException("Recipient fields are invalid")).when(transactionService)
+                .saveRecipient(org.mockito.ArgumentMatchers.any(Recipient.class), org.mockito.ArgumentMatchers.eq("alice"));
+        ExtendedModelMap model = new ExtendedModelMap();
+
+        assertEquals("recipient", controller.recipientPost(new Recipient(), principal, model));
+        assertEquals("Recipient fields are invalid", model.getAttribute("error"));
     }
 
     @Test

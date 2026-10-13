@@ -213,6 +213,10 @@ class TransactionServiceImplTest {
     @Test
     void saveRecipient() {
         Recipient recipient = new Recipient();
+        recipient.setName("Test Recipient");
+        recipient.setEmail("recipient@example.com");
+        recipient.setPhone("1234567890");
+        recipient.setAccountNumber("54321");
         User user = new User();
         user.setUsername("testuser");
         when(userService.findByUsername("testuser")).thenReturn(user);
@@ -222,6 +226,15 @@ class TransactionServiceImplTest {
 
         assertNotNull(savedRecipient);
         verify(recipientDao, times(1)).save(recipient);
+    }
+
+    @Test
+    void rejectsIncompleteRecipient() {
+        Recipient recipient = new Recipient();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> transactionService.saveRecipient(recipient, "testuser"));
+        verify(recipientDao, never()).save(any(Recipient.class));
     }
 
     @Test
@@ -364,6 +377,9 @@ class TransactionServiceImplTest {
         Recipient submitted = new Recipient();
         submitted.setId(1L);
         submitted.setName("updated");
+        submitted.setEmail("recipient@example.com");
+        submitted.setPhone("1234567890");
+        submitted.setAccountNumber("54321");
         when(recipientDao.findById(1L)).thenReturn(Optional.of(existing));
         when(recipientDao.save(existing)).thenReturn(existing);
 
@@ -404,6 +420,10 @@ class TransactionServiceImplTest {
         assertThrows(IllegalArgumentException.class,
                 () -> transactionService.toSomeoneElseTransfer(validAccount, "Current", "1.001",
                         new CurrentAccount(), new SavingsAccount()));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> transactionService.toSomeoneElseTransfer(validAccount, "Current",
+                        "100000000000000000.00", new CurrentAccount(), new SavingsAccount()));
     }
 
     @Test

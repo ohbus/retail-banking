@@ -22,6 +22,8 @@ import xyz.subho.retail.banking.service.UserService;
 @Transactional
 public class AccountServiceImpl implements AccountService {
 
+    private static final int MAX_INTEGER_DIGITS = 17;
+
     private final CurrentAccountDao currentAccountDao;
     private final SavingsAccountDao savingsAccountDao;
     private final UserService userService;
@@ -124,7 +126,8 @@ public class AccountServiceImpl implements AccountService {
         if (!("Current".equalsIgnoreCase(accountType) || "Savings".equalsIgnoreCase(accountType))) {
             throw new IllegalArgumentException("Invalid account type");
         }
-        if (amount == null || amount.signum() <= 0 || amount.scale() > 2) {
+        if (amount == null || amount.signum() <= 0 || amount.scale() > 2
+                || amount.setScale(2).precision() - 2 > MAX_INTEGER_DIGITS) {
             throw new IllegalArgumentException("Amount must be positive with at most two decimal places");
         }
         return amount.setScale(2);

@@ -26,6 +26,7 @@ import xyz.subho.retail.banking.service.UserService;
 public class AccountController {
 
     private static final int TRANSACTIONS_PER_PAGE = 50;
+    private static final int MAX_AMOUNT_LENGTH = 32;
     // shortcut: page 1,000 (50,000 rows); use cursor pagination before deeper history is required.
     private static final int MAX_PAGE = 1_000;
 
@@ -138,6 +139,9 @@ public class AccountController {
     }
 
     private BigDecimal parseAmount(String amount) {
+        if (amount == null || amount.isBlank() || amount.length() > MAX_AMOUNT_LENGTH) {
+            throw new IllegalArgumentException("Amount is invalid");
+        }
         try {
             return new BigDecimal(amount);
         } catch (NumberFormatException | NullPointerException exception) {

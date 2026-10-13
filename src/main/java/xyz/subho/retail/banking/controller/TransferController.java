@@ -93,11 +93,20 @@ public class TransferController {
     }
 
     @RequestMapping(value = "/recipient/save", method = RequestMethod.POST)
-    public String recipientPost(@ModelAttribute("recipient") Recipient recipient, Principal principal) {
+    public String recipientPost(@ModelAttribute("recipient") Recipient recipient, Principal principal, Model model) {
 
-        User user = userService.findByUsername(principal.getName());
-        recipient.setUser(user);
-        transactionService.saveRecipient(recipient, principal.getName());
+        try {
+            User user = userService.findByUsername(principal.getName());
+            recipient.setUser(user);
+            transactionService.saveRecipient(recipient, principal.getName());
+        } catch (IllegalArgumentException exception) {
+            Page<Recipient> recipientPage = findRecipientPage(principal.getName(), 0);
+            model.addAttribute("recipient", recipient);
+            model.addAttribute("recipientList", recipientPage.getContent());
+            model.addAttribute("recipientPage", recipientPage);
+            model.addAttribute("error", exception.getMessage());
+            return "recipient";
+        }
 
         return "redirect:/transfer/recipient";
         
