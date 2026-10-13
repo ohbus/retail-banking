@@ -13,6 +13,7 @@ import xyz.subho.retail.banking.model.User;
 @Service
 public class UserSecurityServiceImpl implements UserDetailsService {
 
+    private static final int MAX_USERNAME_LENGTH = 255;
     private static final Logger logger = LoggerFactory.getLogger(UserSecurityServiceImpl.class);
 
     private final UserDao userDao;
@@ -23,7 +24,9 @@ public class UserSecurityServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    	
+        if (username == null || username.length() > MAX_USERNAME_LENGTH || username.isBlank()) {
+            throw new UsernameNotFoundException("Invalid username");
+        }
         User user = userDao.findByUsername(username);
         
         if (user == null) {

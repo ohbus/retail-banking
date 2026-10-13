@@ -48,13 +48,17 @@ public class UserServiceImpl implements UserService {
     }
 
     public User findByUsername(String username) {
-    	
+        if (username == null || username.length() > MAX_TEXT_LENGTH || username.isBlank()) {
+            return null;
+        }
         return userDao.findByUsername(username);
         
     }
 
     public User findByEmail(String email) {
-    	
+        if (email == null || email.length() > MAX_TEXT_LENGTH || email.isBlank()) {
+            return null;
+        }
         return userDao.findByEmail(email);
     }
 

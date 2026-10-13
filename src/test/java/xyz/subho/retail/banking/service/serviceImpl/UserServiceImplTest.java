@@ -189,6 +189,13 @@ class UserServiceImplTest {
     }
 
     @Test
+    void lookupMethodsRejectInvalidIdentifiersBeforeQuerying() {
+        assertNull(userService.findByUsername("x".repeat(256)));
+        assertNull(userService.findByEmail(" "));
+        verifyNoInteractions(userDao);
+    }
+
+    @Test
     void saveUser() {
         User user = new User();
         when(userDao.save(user)).thenReturn(user);

@@ -2,6 +2,7 @@ package xyz.subho.retail.banking.service.serviceImpl;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
@@ -36,5 +37,11 @@ class UserSecurityServiceImplTest {
         when(userDao.findByUsername("missing")).thenReturn(null);
 
         assertThrows(UsernameNotFoundException.class, () -> service.loadUserByUsername("missing"));
+    }
+
+    @Test
+    void rejectsOversizedUsernameBeforeQuerying() {
+        assertThrows(UsernameNotFoundException.class, () -> service.loadUserByUsername("x".repeat(256)));
+        verifyNoInteractions(userDao);
     }
 }
