@@ -57,14 +57,14 @@ class AdminControllerTest {
     }
 
     @Test
-    void selfDeactivationAlsoTogglesDisabledUser() {
+    void selfDeactivationKeepsDisabledUserDisabled() {
         Principal principal = () -> "alice";
         User user = new User();
         user.setEnabled(false);
         when(userService.findByUsername("alice")).thenReturn(user);
 
         assertEquals("redirect:/", controller.profileSelfDeactivator("alice", new ExtendedModelMap(), principal));
-        assertTrue(user.isEnabled());
+        assertFalse(user.isEnabled());
     }
 
     @Test

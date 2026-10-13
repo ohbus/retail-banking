@@ -264,6 +264,8 @@ class AccountServiceImplTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> accountService.deposit("Current", new BigDecimal("100000000000000000.00"), principal));
+        assertThrows(IllegalArgumentException.class,
+                () -> accountService.deposit("Current", new BigDecimal("1E+1000000000"), principal));
         verifyNoInteractions(userService, currentAccountDao, transactionService);
     }
 

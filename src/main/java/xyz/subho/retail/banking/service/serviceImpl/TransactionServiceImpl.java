@@ -27,6 +27,7 @@ import xyz.subho.retail.banking.service.UserService;
 public class TransactionServiceImpl implements TransactionService {
 
     private static final int MAX_INTEGER_DIGITS = 17;
+    private static final int MAX_AMOUNT_LENGTH = 32;
 
     private final UserService userService;
     private final CurrentTransactionDao currentTransactionDao;
@@ -266,13 +267,13 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private BigDecimal validateAmount(String amount) {
-        if (amount == null) {
+        if (amount == null || amount.isBlank() || amount.length() > MAX_AMOUNT_LENGTH) {
             throw new IllegalArgumentException("Amount is invalid");
         }
         try {
             BigDecimal value = new BigDecimal(amount);
             if (value.signum() <= 0 || value.scale() > 2
-                    || value.setScale(2).precision() - 2 > MAX_INTEGER_DIGITS) {
+                    || value.precision() - value.scale() > MAX_INTEGER_DIGITS) {
                 throw new IllegalArgumentException("Amount must be positive with at most two decimal places");
             }
             return value.setScale(2);

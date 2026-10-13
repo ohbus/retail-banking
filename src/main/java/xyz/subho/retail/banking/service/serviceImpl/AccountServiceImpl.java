@@ -127,7 +127,7 @@ public class AccountServiceImpl implements AccountService {
             throw new IllegalArgumentException("Invalid account type");
         }
         if (amount == null || amount.signum() <= 0 || amount.scale() > 2
-                || amount.setScale(2).precision() - 2 > MAX_INTEGER_DIGITS) {
+                || amount.precision() - amount.scale() > MAX_INTEGER_DIGITS) {
             throw new IllegalArgumentException("Amount must be positive with at most two decimal places");
         }
         return amount.setScale(2);

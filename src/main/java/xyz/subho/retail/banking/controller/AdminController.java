@@ -90,7 +90,7 @@ public class AdminController {
 			return "error";
 
 		User user = userService.findByUsername(uname);
-		user.setEnabled(!user.isEnabled());
+		user.setEnabled(false);
 		
 		userService.saveUser(user);
 		sessionInvalidationService.expireSessions(uname);
