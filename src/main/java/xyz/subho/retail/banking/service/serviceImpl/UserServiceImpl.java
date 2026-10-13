@@ -1,6 +1,7 @@
 package xyz.subho.retail.banking.service.serviceImpl;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import xyz.subho.retail.banking.model.CurrentAccount;
 import xyz.subho.retail.banking.model.SavingsAccount;
@@ -24,7 +25,7 @@ import xyz.subho.retail.banking.service.AccountNumberService;
 public class UserServiceImpl implements UserService {
 
     private static final int MAX_TEXT_LENGTH = 255;
-    private static final int MAX_PASSWORD_LENGTH = 72;
+    private static final int MAX_PASSWORD_BYTES = 72;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserDao userDao;
@@ -96,7 +97,7 @@ public class UserServiceImpl implements UserService {
 
     private void validateRegistration(User user) {
         if (user == null || isBlank(user.getUsername()) || isBlank(user.getPassword())
-                || user.getPassword().length() < 12 || user.getPassword().length() > MAX_PASSWORD_LENGTH
+                || user.getPassword().length() < 12 || exceedsPasswordBytes(user.getPassword())
                 || isBlank(user.getFirstName()) || isBlank(user.getLastName())
                 || isBlank(user.getAadhaarId()) || isBlank(user.getEmail()) || isBlank(user.getPhone())
                 || exceedsTextLength(user.getUsername()) || exceedsTextLength(user.getFirstName())
@@ -112,6 +113,10 @@ public class UserServiceImpl implements UserService {
 
     private boolean exceedsTextLength(String value) {
         return value != null && value.length() > MAX_TEXT_LENGTH;
+    }
+
+    private boolean exceedsPasswordBytes(String value) {
+        return value != null && value.getBytes(StandardCharsets.UTF_8).length > MAX_PASSWORD_BYTES;
     }
 
     public boolean checkUserExists(String username, String email) {

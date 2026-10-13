@@ -116,6 +116,18 @@ class UserServiceImplTest {
     }
 
     @Test
+    void createUserRejectsPasswordBeyondBcryptInputLimit() {
+        User user = new User();
+        user.setUsername("newuser");
+        setRegistrationFields(user);
+        user.setPassword("😀".repeat(19));
+        when(userDao.findByUsername("newuser")).thenReturn(null);
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(user, new HashSet<>()));
+        verify(userDao, never()).save(any(User.class));
+    }
+
+    @Test
     void usesReservedNumbersForBothAccounts() {
         User user = new User();
         user.setUsername("newuser");
