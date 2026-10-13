@@ -74,6 +74,9 @@ public class AdminController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public String profileActivator(@ModelAttribute("username") String uname, Model model) {
 		User user = userService.findByUsername(uname);
+		if (user == null) {
+			return "error";
+		}
 		user.setEnabled(!user.isEnabled());
 		
 		userService.saveUser(user);
@@ -90,6 +93,9 @@ public class AdminController {
 			return "error";
 
 		User user = userService.findByUsername(uname);
+		if (user == null) {
+			return "error";
+		}
 		user.setEnabled(false);
 		
 		userService.saveUser(user);
@@ -103,10 +109,12 @@ public class AdminController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public String currentAccount(@ModelAttribute("username") String uname, Model model,
 			@RequestParam(defaultValue = "0") int page) {
+		User user = userService.findByUsername(uname);
+		if (user == null || user.getCurrentAccount() == null) {
+			return "error";
+		}
 		Page<CurrentTransaction> currentTransactionPage = transactionService
 				.findCurrentTransactionPage(uname, PageRequest.of(normalizePage(page), TRANSACTIONS_PER_PAGE));
-
-		User user = userService.findByUsername(uname);
 		CurrentAccount currentAccount = user.getCurrentAccount();
 
 		model.addAttribute("currentAccount", currentAccount);
@@ -123,9 +131,12 @@ public class AdminController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public String savingsAccount(@ModelAttribute("username") String uname, Model model,
 			@RequestParam(defaultValue = "0") int page) {
+		User user = userService.findByUsername(uname);
+		if (user == null || user.getSavingsAccount() == null) {
+			return "error";
+		}
 		Page<SavingsTransaction> savingsTransactionPage = transactionService
 				.findSavingsTransactionPage(uname, PageRequest.of(normalizePage(page), TRANSACTIONS_PER_PAGE));
-		User user = userService.findByUsername(uname);
 		SavingsAccount savingsAccount = user.getSavingsAccount();
 
 		model.addAttribute("savingsAccount", savingsAccount);

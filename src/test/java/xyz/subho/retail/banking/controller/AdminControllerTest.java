@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.security.Principal;
 
@@ -77,6 +78,22 @@ class AdminControllerTest {
         assertFalse(user.isEnabled());
         verify(userService).saveUser(user);
         verify(sessionInvalidationService).expireSessions("bob");
+    }
+
+    @Test
+    void unknownAdminTargetReturnsError() {
+        when(userService.findByUsername("missing")).thenReturn(null);
+
+        assertEquals("error", controller.profileActivator("missing", new ExtendedModelMap()));
+        verifyNoInteractions(sessionInvalidationService);
+    }
+
+    @Test
+    void unknownAdminAccountTargetReturnsErrorBeforeReadingTransactions() {
+        when(userService.findByUsername("missing")).thenReturn(null);
+
+        assertEquals("error", controller.currentAccount("missing", new ExtendedModelMap(), 0));
+        verifyNoInteractions(transactionService);
     }
 
     @Test
