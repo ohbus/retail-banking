@@ -428,6 +428,9 @@ class TransactionServiceImplTest {
         assertThrows(IllegalArgumentException.class,
                 () -> transactionService.toSomeoneElseTransfer(validAccount, "Current",
                         "1E+1000000000", new CurrentAccount(), new SavingsAccount()));
+        assertThrows(IllegalArgumentException.class,
+                () -> transactionService.toSomeoneElseTransfer(validAccount, "Current",
+                        "1E+2147483647", new CurrentAccount(), new SavingsAccount()));
     }
 
     @Test

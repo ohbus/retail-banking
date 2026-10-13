@@ -272,8 +272,9 @@ public class TransactionServiceImpl implements TransactionService {
         }
         try {
             BigDecimal value = new BigDecimal(amount);
+            long integerDigits = (long) value.precision() - value.scale();
             if (value.signum() <= 0 || value.scale() > 2
-                    || value.precision() - value.scale() > MAX_INTEGER_DIGITS) {
+                    || integerDigits > MAX_INTEGER_DIGITS) {
                 throw new IllegalArgumentException("Amount must be positive with at most two decimal places");
             }
             return value.setScale(2);
